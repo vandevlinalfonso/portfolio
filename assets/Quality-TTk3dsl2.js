@@ -1,0 +1,2 @@
+const r=(()=>{const e=window.matchMedia("(prefers-reduced-motion: reduce)").matches,n=window.matchMedia("(pointer: coarse)").matches,o=window.innerWidth<768,t=e||n||o;return{reducedMotion:e,isMobile:n||o,low:t,postProcessing:!t,particleMultiplier:t?.4:1,maxPixelRatio:t?1.5:2}})();function i(){try{const e=document.createElement("canvas");return!!(window.WebGLRenderingContext&&(e.getContext("webgl2")||e.getContext("webgl")))}catch{return!1}}export{i,r as q};
+//# sourceMappingURL=Quality-TTk3dsl2.js.map

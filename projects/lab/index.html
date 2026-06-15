@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab — Anatomy of a Breach</title>
+  <meta name="description" content="Experimental UI playground: GPU embers, fluid ink, kinetic type. Bring a cursor.">
+  <style>
+    body { overflow: hidden; }
+
+    #stage {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    #stage canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ---------- Switcher ---------- */
+
+    #lab-ui {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 0 var(--margin) 30px;
+      pointer-events: none;
+    }
+
+    #lab-hint {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      transition: opacity 0.5s ease;
+      text-align: center;
+    }
+
+    #lab-tabs {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    #lab-tabs button {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      background: rgba(10, 10, 11, 0.55);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      color: var(--fg-faint);
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #lab-tabs button:hover { color: var(--fg); }
+
+    #lab-tabs button.active {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #lab-title {
+      position: fixed;
+      top: 50%;
+      left: var(--margin);
+      transform: translateY(-50%);
+      z-index: 30;
+      pointer-events: none;
+      writing-mode: vertical-rl;
+      font-size: 10px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      opacity: 0.7;
+    }
+
+    @media (max-width: 640px) {
+      #lab-title { display: none; }
+      #lab-tabs button { padding: 11px 13px; }
+    }
+  </style>
+  <script type="module" crossorigin src="/portfolio/assets/lab-Co0rMIVf.js"></script>
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/Cursor-C1SwI0fm.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/Quality-TTk3dsl2.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/three-core-CYWnSrLN.js">
+  <link rel="stylesheet" crossorigin href="/portfolio/assets/Cursor-LzlWAB8F.css">
+</head>
+<body>
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <header class="frame-top">
+    <div class="frame-id">
+      <div class="case-id">Case File 0001 — Annex</div>
+      <div class="examiner">Lab — Experimental UI</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="../../">Case File</a>
+      <a href="../../writeups/">Writeups</a>
+      <a href="../" class="active">Projects</a>
+    </nav>
+  </header>
+
+  <div id="lab-title">Experiment in progress — touch everything</div>
+
+  <div id="stage"></div>
+
+  <div id="lab-ui">
+    <div id="lab-hint"></div>
+    <div id="lab-tabs" role="tablist" aria-label="Experiments"></div>
+  </div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Hardware Acceleration Required</h1>
+      <p>These experiments need WebGL. <a href="../">Back to projects</a>.</p>
+    </div>
+  </div>
+
+</body>
+</html>

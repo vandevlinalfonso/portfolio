@@ -1,0 +1,141 @@
+{
+  "couple": {
+    "groom": { "name": "Manu", "fullName": "Manu", "parents": "in loving memory of his father", "country": "DE" },
+    "bride": {
+      "name": "Vella", "fullName": "Vella", "parents": "daughter of a loving family in Bandung", "country": "ID",
+      "dogs": [
+        { "name": "Sugar", "look": "white-fluffy" },
+        { "name": "Omi", "look": "black-sleek" }
+      ]
+    }
+  },
+  "hashtag": "#ManuFindetVella",
+  "date": "2027-05-08T10:00:00+02:00",
+  "dateDisplay": "Saturday, May 8th, 2027",
+  "door": {
+    "nameplate": "Manu · Vella",
+    "flatNo": "Apt. 12",
+    "bell": "Ring the bell",
+    "mat": "come in, we left it open",
+    "kicker": "You are invited to the home of"
+  },
+  "music": { "mode": "ambient", "src": "", "title": "", "barkSrc": "" },
+  "hud": {
+    "hints": [
+      "Drag to look around — everything with a story glows when you're close. The dogs know where the good ones are.",
+      "Looking for the date and place? They're pinned to the corkboard by the front door — or use the shortcuts below.",
+      "The guestbook on the dining table is how you RSVP — your wish becomes a frame on their wall."
+    ],
+    "nav": {
+      "details": "Date & place",
+      "guestbook": "Sign the guestbook",
+      "wishes": "Wishes wall"
+    }
+  },
+  "memories": [
+    {
+      "id": "sketch", "who": "bride", "year": "1995", "object": "framed pencil sketch",
+      "title": "The house with the loud heart",
+      "caption": "The kampung in Bandung where Vella arrived with the morning prayers — second of three, loudest from day one. Her father drew this the week she was born."
+    },
+    {
+      "id": "brother", "who": "bride", "year": "2008", "object": "small school photo",
+      "title": "The doorway",
+      "caption": "The small one is her little brother. The bullies at school knew exactly one thing about him: his sister stood in doorways and did not move."
+    },
+    {
+      "id": "journals", "who": "bride", "year": "2013", "object": "stack of journals",
+      "title": "Ink before sleep",
+      "caption": "Eleven journals, one rubber band. Stories nobody assigned, written under a mosquito net by flashlight. She wrote the world bigger than her street."
+    },
+    {
+      "id": "keybowl", "who": "bride", "year": "2018", "object": "nurse's lanyard",
+      "title": "Night shifts",
+      "caption": "Her hospital lanyard, retired to the key bowl. White uniform, quiet corridors — she learned that care is a language you speak with your hands."
+    },
+    {
+      "id": "flashcards", "who": "bride", "year": "2022", "object": "fridge magnets",
+      "title": "Der, die, das",
+      "caption": "The original flashcards, promoted to fridge magnets. Midnight grammar with two dogs asleep on the homework — and a language-practice chat app she installed just to have someone to write to."
+    },
+    {
+      "id": "snowglobe", "who": "groom", "year": "1991", "object": "snow globe",
+      "title": "A Mannheim winter",
+      "caption": "Snow over the old water tower. Manu arrived in Mannheim in 1991 — a Rhine-side city kid with January in his blood."
+    },
+    {
+      "id": "watch", "who": "groom", "year": "1994", "object": "father's wristwatch",
+      "title": "Kept wound",
+      "caption": "His father's watch. Manu was three when it stopped being worn. He taught himself to wind it — and in thirty years he has never once let it stop."
+    },
+    {
+      "id": "radio", "who": "groom", "year": "2005", "object": "repaired radio",
+      "title": "The quiet fixer",
+      "caption": "The radio he brought back to life at fourteen, in the children's home where he grew up. A mind that never idles — the doctors had a word for it — found its calm in making broken things speak again."
+    },
+    {
+      "id": "blueprints", "who": "groom", "year": "2010", "object": "first blueprints",
+      "title": "His name in the corner",
+      "caption": "Nineteen, first job, first drawings signed with his own name. Nobody handed Manu a head start — so he sat down and drew one."
+    },
+    {
+      "id": "phone", "who": "both", "year": "2023", "object": "phone, kept charged",
+      "title": "The first message",
+      "caption": "She typed her practice German into a chat app. A stranger in Mannheim corrected her gently — then never stopped replying. Some apps match people. This one just let two people keep talking."
+    },
+    {
+      "id": "crates", "who": "both", "year": "2023", "object": "two travel crates",
+      "title": "Two passengers, four paws",
+      "caption": "10,742 kilometres in cargo-approved comfort. Sugar saw snow first and refused to comment. Omi barked at it on principle. Home now lives in two places."
+    },
+    {
+      "id": "leashes", "who": "both", "year": "now", "object": "leashes by the door",
+      "title": "The welcome committee",
+      "caption": "Two leashes, two bowls, two opinions. Sugar — the fluffy one — approves of all guests. Omi — the sleek one — approves of most. You seem to be doing fine."
+    }
+  ],
+  "reveal": {
+    "gate": 6,
+    "guard": "Not yet — a few more memories first. (Omi is very serious about this.)",
+    "proposalTitle": "The question, twice",
+    "proposalCaption": "A winter garden strung with lights, December 2026. He asked in German. She answered in Indonesian. Both meant the same word. Omi interrupted; nobody minded.",
+    "kicker": "And so, in this home",
+    "line": "are getting married"
+  },
+  "details": {
+    "kicker": "The practical wall",
+    "events": [
+      { "name": "The Ceremony", "time": "10:00 — 12:00", "place": "Orangerie am Rhein", "note": "Family & close friends" },
+      { "name": "The Reception", "time": "13:00 — 17:00", "place": "The Winter Garden", "note": "All guests welcome" }
+    ],
+    "venue": {
+      "name": "Orangerie am Rhein",
+      "address": "8 Uferweg, Cologne",
+      "mapsUrl": "https://maps.google.com/?q=Cologne"
+    },
+    "rsvp": { "deadline": "April 10th, 2027" }
+  },
+  "dogLines": {
+    "Sugar": [
+      "Sugar approves of you. Sugar approves of everyone — but still, it's nice.",
+      "The fluffy one is Sugar: professional greeter, zero standards, full heart.",
+      "Sugar has lived on two continents and rated the snacks on both. Five stars.",
+      "Sugar says: the good memories are the ones that glow."
+    ],
+    "Omi": [
+      "Omi is reserving judgment. (Between us — you're doing well.)",
+      "The sleek one is Omi: head of security, keeper of the ring box.",
+      "Omi has heard all these stories before. Tail wags anyway.",
+      "Omi barked at German snow once, on principle. It stopped by April."
+    ]
+  },
+  "wishes": [
+    { "name": "Sugar & Omi", "side": "bride", "attending": true, "plusOnes": 0, "country": "DE", "message": "We crossed an ocean for these two. Worth it. (Woof, twice.)" },
+    { "name": "The pack back home", "side": "bride", "attending": false, "plusOnes": 0, "country": "ID", "message": "We kept the warm half of home ready. Come visit soon — bring the twins." },
+    { "name": "Ibu & Bapak", "side": "bride", "attending": true, "plusOnes": 0, "country": "ID", "message": "Our brave girl found the word she was looking for. Blessings, always." },
+    { "name": "The Mannheim crew", "side": "groom", "attending": true, "plusOnes": 1, "country": "DE", "message": "He fixed our radios, our bikes, and our spirits. She fixed him. Prost!" },
+    { "name": "Frau Bauer", "side": "groom", "attending": true, "plusOnes": 0, "country": "DE", "message": "I watched this boy grow up steady against the odds. Nobody deserves this day more." },
+    { "name": "Rina", "side": "bride", "attending": false, "plusOnes": 0, "country": "ID", "message": "Six time zones can't dilute this friendship. Save me a dance on video call." }
+  ],
+  "closing": "Make yourself at home — we can't wait to make room for you on the big day."
+}

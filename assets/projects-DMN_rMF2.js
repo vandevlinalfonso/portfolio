@@ -1,0 +1,13 @@
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{C as u}from"./Cursor-C1SwI0fm.js";const g=[{href:"./visions/",title:"Visions",desc:"Three photomanipulation plates hung in a dark volume. Scroll dollies the camera through the surface of each image.",tags:["WebGL","Depth shader","Scroll rig"],year:"2026",status:"Live",peek:{image:"./visions/1.jpeg"}},{href:"./vows/",title:"Vows",desc:"A collection of interactive wedding invitations — each couple gets a different concept. No. 01: a continuous film opened by a red thread. No. 02: an explorable apartment where every object holds a memory.",tags:["Interaction design","Canvas film","Config template"],year:"2026",status:"Live",peek:{gradient:"linear-gradient(135deg, #f7ece4, #efc8c4 55%, #d9a05b)",label:"L ♥ S",color:"#7a3b3b"}},{href:"./lab/",title:"Lab",desc:"Experimental UI playground — two hundred thousand embers, a fluid ink simulation, a kinetic type wall. Bring a cursor.",tags:["GPGPU","Fluid sim","Kinetic type"],year:"2026",status:"Growing",peek:{gradient:"radial-gradient(circle at 30% 60%, #2b0d0a, #0a0a0b 70%)",label:"✦ ✦ ✦",color:"#c43a2f"}}];function h(){const p=document.getElementById("works"),t=document.getElementById("peek");g.forEach((e,n)=>{const a=document.createElement("a");a.className="work",a.href=e.href,a.dataset.index=n,a.innerHTML=`
+      <span class="w-no">0${n+1}</span>
+      <span class="w-main">
+        <span class="w-title">${e.title}</span>
+        <span class="w-desc" style="display:block">${e.desc}</span>
+        <span class="w-tags">${e.tags.map(l=>`<span>${l}</span>`).join("")}</span>
+      </span>
+      <span class="w-side">
+        <span>${e.year}</span>
+        <span class="w-status ${e.status==="Live"?"":"dim"}">${e.status}</span>
+      </span>
+    `,p.appendChild(a);const s=document.createElement("div");s.className="peek-pane",e.peek.image?s.style.backgroundImage=`url(${e.peek.image})`:(s.style.background=e.peek.gradient,s.innerHTML=`<span style="color:${e.peek.color}">${e.peek.label}</span>`),t.appendChild(s),a.addEventListener("mouseenter",()=>{t.classList.add("on"),[...t.children].forEach((l,m)=>l.classList.toggle("show",m===n))}),a.addEventListener("mouseleave",()=>t.classList.remove("on")),setTimeout(()=>a.classList.add("in"),150+n*120)});let i=0,o=0,r=0,c=0;window.addEventListener("mousemove",e=>{r=e.clientX,c=e.clientY},{passive:!0}),function e(){i+=(r-i)*.12,o+=(c-o)*.12,t.style.left=`${i+28}px`,t.style.top=`${o-100}px`,requestAnimationFrame(e)}()}function d(){new u,h()}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",d):d();
+//# sourceMappingURL=projects-DMN_rMF2.js.map

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anatomy of a Breach</title>
+  <meta name="description" content="The case file of a security engineer. Every system is already compromised — the work is deciding how far it spreads.">
+  <style>
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---------- Telemetry ---------- */
+
+    #telemetry {
+      display: flex;
+      gap: 20px;
+      color: var(--fg-dim);
+      text-align: right;
+    }
+
+    #telemetry .t-label {
+      color: var(--fg-faint);
+      margin-right: 6px;
+    }
+
+    #t-decay { color: var(--fg); transition: color 0.6s ease; }
+    #t-decay.critical { color: var(--accent); }
+    #t-status { color: #7da87d; }
+
+    #t-status.degrading {
+      color: var(--accent);
+      animation: status-blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes status-blink {
+      50% { opacity: 0.3; }
+    }
+
+    /* Section index, right edge */
+    #section-nav {
+      position: fixed;
+      right: var(--margin);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: right;
+    }
+
+    #section-nav button {
+      background: none;
+      border: none;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--fg-faint);
+      cursor: pointer;
+      padding: 2px 0;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    #section-nav button .nav-label {
+      opacity: 0;
+      transform: translateX(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    #section-nav button:hover .nav-label,
+    #section-nav button.active .nav-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #section-nav button.active {
+      color: var(--accent);
+    }
+
+    #sound-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: var(--margin);
+      z-index: 50;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--fg-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease, transform 0.25s ease-out;
+      will-change: transform;
+    }
+
+    #sound-toggle:hover { color: var(--fg); border-color: var(--fg-dim); }
+    #sound-toggle.on { color: var(--accent); border-color: var(--accent); }
+
+    /* ---------- Content sections ---------- */
+
+    main {
+      position: relative;
+      z-index: 2;
+    }
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18vh var(--margin);
+      max-width: 1560px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ---------- 00 Hero ---------- */
+
+    #s-hero h1 {
+      font-size: clamp(56px, 11vw, 152px);
+      font-weight: 700;
+      line-height: 0.94;
+      letter-spacing: -0.025em;
+      margin-bottom: 40px;
+    }
+
+    #s-hero h1 .accent { color: var(--accent); }
+
+    .hero-lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(16px, 1.6vw, 21px);
+      line-height: 1.55;
+      color: var(--fg-dim);
+      max-width: 540px;
+    }
+
+    .hero-meta {
+      margin-top: 48px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span b { color: var(--fg-dim); font-weight: 400; }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 40px;
+      left: var(--margin);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      animation: cue-pulse 2.6s ease-in-out infinite;
+    }
+
+    #s-hero { position: relative; }
+
+    @keyframes cue-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.85; }
+    }
+
+    /* ---------- Shared section type ---------- */
+
+    h2 {
+      font-size: clamp(34px, 5.6vw, 80px);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      margin-bottom: 36px;
+      max-width: 14em;
+    }
+
+    .body-copy {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(15px, 1.4vw, 19px);
+      line-height: 1.65;
+      color: var(--fg-dim);
+      max-width: 560px;
+    }
+
+    .body-copy + .body-copy { margin-top: 24px; }
+
+    .sec-hint {
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    /* ---------- 01 Specimen: two-column ---------- */
+
+    #s-specimen .cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 48px;
+    }
+
+    #s-specimen .cols > div:first-child { grid-column: 2; }
+
+    /* ---------- 02 Incidents: case rows ---------- */
+
+    #case-list {
+      margin-top: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-row {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) 130px 80px 56px;
+      align-items: baseline;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--line);
+      padding: 26px 0;
+      cursor: pointer;
+      color: var(--fg);
+      font-family: var(--mono);
+      transition: padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .case-row .c-idx {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--fg-faint);
+    }
+
+    .case-row .c-title {
+      font-family: var(--display);
+      font-size: clamp(20px, 2.6vw, 38px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+      padding-right: 24px;
+    }
+
+    .case-row .c-class,
+    .case-row .c-year {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    .case-row .c-arrow {
+      font-family: var(--display);
+      font-size: 20px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-align: right;
+    }
+
+    .case-row:hover {
+      padding-left: 16px;
+    }
+
+    .case-row:hover .c-title { color: var(--accent); }
+
+    .case-row:hover .c-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .case-row.examined .c-idx::after {
+      content: ' ●';
+      color: var(--accent);
+    }
+
+    /* ---------- 03 Doctrine ---------- */
+
+    .quote {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(24px, 3.8vw, 54px);
+      line-height: 1.18;
+      letter-spacing: -0.015em;
+      color: var(--fg);
+      max-width: 18em;
+      margin-bottom: 9vh;
+      display: flex;
+      gap: 28px;
+    }
+
+    .quote:last-child { margin-bottom: 0; }
+
+    .quote .q-idx {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      padding-top: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- 04 Contact ---------- */
+
+    #contact-link {
+      font-family: var(--display);
+      font-size: clamp(44px, 8.5vw, 120px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--fg);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 56px;
+      transition: color 0.3s ease;
+    }
+
+    #contact-link:hover { color: var(--accent); }
+
+    #contact-link .arrow { color: var(--accent); }
+
+    #socials {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin-bottom: 96px;
+    }
+
+    #socials a {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #socials a:hover {
+      color: var(--fg);
+      border-color: var(--accent);
+    }
+
+    .more-evidence {
+      display: flex;
+      align-items: baseline;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .more-evidence .sec-hint { margin: 0; }
+
+    .more-evidence a {
+      font-family: var(--display);
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .more-evidence a:hover { color: var(--accent); }
+
+    .footer-line {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    /* ---------- Case panel (right sheet) ---------- */
+
+    #panel-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(5, 5, 6, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    #project-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(540px, 100vw);
+      background: rgba(12, 12, 13, 0.97);
+      border-left: 1px solid var(--line);
+      padding: 96px 48px 48px;
+      z-index: 100;
+      overflow-y: auto;
+      transform: translateX(101%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(14px);
+    }
+
+    body.panel-open #project-panel { transform: translateX(0); }
+
+    body.panel-open #panel-scrim {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+
+    .panel-close:hover { opacity: 1; }
+
+    .panel-close::before,
+    .panel-close::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--fg);
+    }
+
+    .panel-close::before { transform: rotate(45deg); }
+    .panel-close::after { transform: rotate(-45deg); }
+
+    #panel-meta {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .panel-title {
+      font-family: var(--display);
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+      margin-bottom: 40px;
+    }
+
+    .panel-section {
+      margin-bottom: 26px;
+      padding-left: 16px;
+      border-left: 1px solid var(--line);
+    }
+
+    .panel-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 8px;
+    }
+
+    .panel-content {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--fg-dim);
+    }
+
+    /* ---------- Responsive ---------- */
+
+    @media (max-width: 900px) {
+      #s-specimen .cols { grid-template-columns: 1fr; }
+      #s-specimen .cols > div:first-child { grid-column: 1; }
+      .case-row { grid-template-columns: 48px minmax(0, 1fr) 56px; }
+      .case-row .c-year, .case-row .c-arrow { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      #telemetry { display: none; }
+      #section-nav { display: none; }
+      section { padding: 14vh var(--margin); }
+    }
+  </style>
+  <script type="module" crossorigin src="/portfolio/assets/main-B8a_7Wj_.js"></script>
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/Cursor-C1SwI0fm.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/three-core-CYWnSrLN.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/gsap-core-C8pce-KX.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/AudioManager-CLPgCg6w.js">
+  <link rel="modulepreload" crossorigin href="/portfolio/assets/Quality-TTk3dsl2.js">
+  <link rel="stylesheet" crossorigin href="/portfolio/assets/Cursor-LzlWAB8F.css">
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="boot">
+      <div class="boot-header">Forensic Runtime v3.0.0</div>
+      <div id="boot-log"></div>
+      <div class="boot-progress"><div id="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Evidence Unavailable</h1>
+      <p>This examination requires WebGL, which your browser does not support or has disabled.</p>
+      <p>
+        The case files remain accessible:
+        <!-- TODO: replace with your real links -->
+        <a href="https://github.com/yourusername">GitHub</a> ·
+        <a href="https://linkedin.com/in/yourusername">LinkedIn</a> ·
+        <a href="mailto:your@email.com">Email</a>
+      </p>
+    </div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <div class="frame-top">
+    <div class="frame-id">
+      <div class="case-id">Case File 0001 — Open Incident</div>
+      <!-- TODO: replace with your real name -->
+      <div class="examiner" id="portfolio-name">Examiner: ████████</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="./" class="active">Case File</a>
+      <a href="./writeups/">Writeups</a>
+      <a href="./projects/">Projects</a>
+    </nav>
+    <div id="telemetry" aria-hidden="true">
+      <div><span class="t-label">Decay</span><span id="t-decay">30.0%</span></div>
+      <div><span class="t-label">Session</span><span id="t-session">00:00</span></div>
+      <div><span class="t-label">Cases</span><span id="t-wounds">0/—</span></div>
+      <div><span class="t-label">Specimen</span><span id="t-status">STABLE</span></div>
+    </div>
+  </div>
+
+  <nav id="section-nav" aria-label="Sections"></nav>
+
+  <button id="sound-toggle" aria-label="Toggle sound">Sound: Off</button>
+
+  <main>
+    <section id="s-hero" data-section="0" data-name="Index">
+      <div class="sec-label" data-reveal>Case File 0001 — Open Incident</div>
+      <h1 data-reveal>Anatomy<br>of a <span class="accent">Breach</span></h1>
+      <p class="hero-lede" data-reveal>
+        The case file of a security engineer. Every system I touch is already
+        compromised — the work is deciding how far it spreads.
+      </p>
+      <div class="hero-meta" data-reveal>
+        <span><b>Role</b> — Security / Infrastructure</span>
+        <span><b>Specimen</b> — Live, decaying</span>
+        <span><b>Status</b> — Accepting incidents</span>
+      </div>
+      <div class="scroll-cue">Begin examination ↓</div>
+    </section>
+
+    <section id="s-specimen" data-section="1" data-name="Specimen">
+      <div class="cols">
+        <div>
+          <div class="sec-label" data-reveal>01 — The Specimen</div>
+          <h2 data-reveal>The specimen never resets.</h2>
+          <p class="body-copy" data-reveal>
+            The artifact behind this text is the system under examination —
+            fractured, instrumented, decaying in real time. It rots while you
+            read. It rots while you are away. Every case you open leaves a
+            permanent scar that will still be here when you return.
+          </p>
+          <p class="body-copy" data-reveal>
+            That is the honest shape of security work. Nothing returns to
+            pristine. Systems accumulate consequence, and the job is not to
+            prevent every wound — it is to decide which damage you can live
+            with, and contain the rest.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="s-incidents" data-section="2" data-name="Incidents">
+      <div class="sec-label" data-reveal>02 — Incidents</div>
+      <h2 data-reveal>Five contained breaches.</h2>
+      <p class="sec-hint" data-reveal>
+        Hover to isolate the fragment · Open a case to read the report · What you examine stays marked
+      </p>
+      <div id="case-list"></div>
+    </section>
+
+    <section id="s-doctrine" data-section="3" data-name="Doctrine">
+      <div class="sec-label" data-reveal>03 — Doctrine</div>
+      <div id="quote-list"></div>
+    </section>
+
+    <section id="s-contact" data-section="4" data-name="Contact">
+      <div class="sec-label" data-reveal>04 — Contact</div>
+      <!-- TODO: replace with your real email -->
+      <a id="contact-link" href="mailto:your@email.com" data-reveal>
+        Open a<br>channel <span class="arrow">→</span>
+      </a>
+      <div id="socials" data-reveal></div>
+      <div class="more-evidence" data-reveal>
+        <span class="sec-hint">Further evidence</span>
+        <a href="./writeups/">Machine Writeups →</a>
+        <a href="./projects/">Interactive Works →</a>
+      </div>
+      <div class="footer-line" data-reveal>
+        <span>Examination complete — specimen retains all damage</span>
+        <span id="footer-decay">Decay at close: —</span>
+      </div>
+    </section>
+  </main>
+
+  <div id="panel-scrim"></div>
+
+  <aside id="project-panel" aria-hidden="true">
+    <div class="panel-close" id="panel-close"></div>
+    <div id="panel-meta"></div>
+    <div class="panel-title" id="panel-title"></div>
+    <div class="panel-section">
+      <div class="panel-label">Context</div>
+      <div class="panel-content" id="panel-context"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">Threat</div>
+      <div class="panel-content" id="panel-threat"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">Action</div>
+      <div class="panel-content" id="panel-action"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label">Tradeoff</div>
+      <div class="panel-content" id="panel-tradeoff"></div>
+    </div>
+  </aside>
+
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vows — A Collection of Interactive Wedding Invitations</title>
+  <meta name="description" content="A collection of interactive wedding invitations: each one a different couple, a different concept, the same promise — not your ordinary invitation.">
+  <style>
+    :root {
+      --gold: #e3c98e;
+      --cream: #faf2e4;
+      --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--serif);
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse at 78% 12%, rgba(95, 68, 100, 0.5), transparent 55%),
+        radial-gradient(ellipse at 18% 85%, rgba(70, 41, 63, 0.55), transparent 60%),
+        linear-gradient(170deg, #100d1d, #2c1f35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(28px, 6vw, 80px);
+      overflow-x: hidden;
+    }
+
+    /* a quiet starfield */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1.2px 1.2px at 12% 18%, rgba(244, 222, 178, 0.8), transparent 100%),
+        radial-gradient(1px 1px at 28% 64%, rgba(244, 222, 178, 0.5), transparent 100%),
+        radial-gradient(1.4px 1.4px at 41% 9%, rgba(244, 222, 178, 0.7), transparent 100%),
+        radial-gradient(1px 1px at 57% 38%, rgba(244, 222, 178, 0.45), transparent 100%),
+        radial-gradient(1.5px 1.5px at 71% 15%, rgba(244, 222, 178, 0.75), transparent 100%),
+        radial-gradient(1px 1px at 84% 52%, rgba(244, 222, 178, 0.5), transparent 100%),
+        radial-gradient(1.2px 1.2px at 93% 27%, rgba(244, 222, 178, 0.65), transparent 100%),
+        radial-gradient(1px 1px at 8% 44%, rgba(244, 222, 178, 0.4), transparent 100%),
+        radial-gradient(1.2px 1.2px at 64% 78%, rgba(244, 222, 178, 0.5), transparent 100%);
+    }
+
+    #back-link {
+      position: fixed;
+      top: 18px;
+      left: 20px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: rgba(250, 242, 228, 0.7);
+      transition: color 0.3s ease;
+    }
+
+    #back-link:hover { color: var(--gold); }
+
+    header { text-align: center; margin-bottom: clamp(40px, 7vh, 70px); }
+
+    .kicker {
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(52px, 10vw, 104px);
+      font-style: italic;
+      font-weight: 500;
+      line-height: 1;
+      background: linear-gradient(110deg, #faf2e4 38%, #e3c98e 48%, #fff6dd 50%, #e3c98e 52%, #faf2e4 62%);
+      background-size: 240% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gold-sweep 7s ease-in-out infinite;
+    }
+
+    @keyframes gold-sweep {
+      0%, 100% { background-position: 120% 0; }
+      50% { background-position: -20% 0; }
+    }
+
+    .sub {
+      margin-top: 16px;
+      font-size: clamp(15px, 1.8vw, 18px);
+      font-style: italic;
+      color: rgba(250, 242, 228, 0.66);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(340px, 88vw), 1fr));
+      gap: clamp(18px, 3vw, 34px);
+      width: min(880px, 100%);
+    }
+
+    .inv {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: clamp(26px, 4vw, 40px);
+      border: 1px solid rgba(227, 201, 142, 0.3);
+      background: rgba(16, 13, 29, 0.5);
+      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .inv::before {
+      content: '';
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(227, 201, 142, 0.14);
+      pointer-events: none;
+    }
+
+    a.inv:hover {
+      transform: translateY(-8px);
+      border-color: rgba(227, 201, 142, 0.75);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.45);
+    }
+
+    .inv .no {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(250, 242, 228, 0.45);
+    }
+
+    .inv h2 {
+      margin: 12px 0 10px;
+      font-size: clamp(30px, 4.6vw, 42px);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--cream);
+    }
+
+    .inv p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: rgba(250, 242, 228, 0.62);
+      min-height: 3.2em;
+    }
+
+    .inv .cta {
+      display: inline-block;
+      margin-top: 22px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(227, 201, 142, 0.45);
+      padding-bottom: 3px;
+    }
+
+    .inv.soon { opacity: 0.65; }
+
+    .inv.soon .cta {
+      color: rgba(250, 242, 228, 0.5);
+      border-bottom-color: rgba(250, 242, 228, 0.2);
+    }
+
+    footer {
+      margin-top: clamp(40px, 7vh, 70px);
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(250, 242, 228, 0.4);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <a id="back-link" href="../">← Projects</a>
+
+  <header>
+    <div class="kicker">A collection of interactive invitations</div>
+    <h1>Vows</h1>
+    <p class="sub">Each couple gets a different concept. None of them get a brochure.</p>
+  </header>
+
+  <main>
+    <a class="inv" href="./thread/">
+      <div class="no">No. 01 — Liam &amp; Sora</div>
+      <h2>Thread</h2>
+      <p>One continuous film. Pull the red thread, pick a lit window in the night city, and walk a life — the other half is hidden in every chapter.</p>
+      <span class="cta">Open the invitation</span>
+    </a>
+
+    <a class="inv" href="./home/">
+      <div class="no">No. 02 — Manu &amp; Vella</div>
+      <h2>Open House</h2>
+      <p>Ring the doorbell and walk through their apartment. Every object holds a memory, two dogs know where the good ones are, and the guestbook is waiting on the dining table.</p>
+      <span class="cta">Ring the bell</span>
+    </a>
+  </main>
+
+  <footer>Built as reusable templates — every name, date and chapter is config data</footer>
+</body>
+</html>

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>(function(){var d=document.documentElement,c=null;try{c=JSON.parse(localStorage.getItem('aob-theme'))}catch(e){}if(!c||!c.vars)c={"id":"devsecops","vars":{"--accent":"#2fb6c4","--accent-rgb":"47, 182, 196","--accent-ink":"#16757f"}};for(var k in c.vars)d.style.setProperty(k,c.vars[k]);d.setAttribute('data-lens',c.id)})();</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projects — Anatomy of a Breach</title>
+  <title data-lens-tpl="Projects · {title}">Projects · Security as Code</title>
   <meta name="description" content="Interactive works: WebGL galleries, experimental UI, and playful web experiences.">
   <style>
     main {
@@ -78,12 +80,12 @@
       transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.35s ease;
     }
 
-    .work:hover .w-title {
+    .work:is(:hover, :focus-visible) .w-title {
       transform: translateX(16px);
       color: var(--accent);
     }
 
-    .work:hover .w-no { color: var(--accent); }
+    .work:is(:hover, :focus-visible) .w-no { color: var(--accent); }
 
     .work .w-desc {
       font-family: var(--display);
@@ -120,7 +122,7 @@
 
     .work .w-status {
       color: var(--accent);
-      border: 1px solid rgba(196, 58, 47, 0.4);
+      border: 1px solid rgba(var(--accent-rgb), 0.4);
       padding: 4px 8px;
     }
 
@@ -201,10 +203,10 @@
       #peek { display: none; }
     }
   </style>
-  <script type="module" crossorigin src="/portfolio/assets/projects-DMN_rMF2.js"></script>
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/Cursor-C1SwI0fm.js">
-  <link rel="stylesheet" crossorigin href="/portfolio/assets/Cursor-LzlWAB8F.css">
+  <script type="module" crossorigin src="../assets/projects-BKuY2mfi.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="../assets/Cursor-12wpnqhY.js">
+  <link rel="stylesheet" crossorigin href="../assets/Cursor-CGBMp8Ou.css">
 </head>
 <body>
   <div id="cursor-dot"></div>
@@ -212,23 +214,24 @@
 
   <header class="frame-top">
     <div class="frame-id">
-      <div class="case-id">Case File 0001 — Annex</div>
-      <div class="examiner">Projects — Interactive Works</div>
+      <div class="case-id" data-lens-tpl="{file} · Annex">System 0001 · Annex</div>
+      <div class="examiner">Projects · Interactive Works</div>
     </div>
     <nav class="frame-nav" aria-label="Pages">
-      <a href="../">Case File</a>
-      <a href="../writeups/">Writeups</a>
+      <a href="../" data-lens-tpl="{home}">Home</a>
       <a href="./" class="active">Projects</a>
+      <a href="../cv/">Dossier</a>
+      <a href="../writeups/">Writeups</a>
     </nav>
   </header>
 
   <main>
     <div class="pj-head">
-      <div class="sec-label">Annex — Interactive Works</div>
+      <div class="sec-label">Annex · Interactive Works</div>
       <h1>Things I<br><span class="accent">build to feel.</span></h1>
       <p class="pj-lede">
         Off the clock, the same hands that pull apart binaries build
-        experiences — galleries, toys, invitations. Everything below runs
+        experiences: galleries, toys, invitations. Everything below runs
         live in your browser.
       </p>
     </div>
@@ -236,7 +239,7 @@
     <div id="works"></div>
 
     <div class="pj-foot">
-      <a href="../">← Case File</a>
+      <a href="../" data-lens-tpl="← {home}">← Home</a>
       <a href="../writeups/">Machine Writeups →</a>
     </div>
   </main>

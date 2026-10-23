@@ -1,0 +1,100 @@
+{
+  "identity": {
+    "name": "Vandevlin Wibawa",
+    "role": "Security Engineer",
+    "discipline": "DevSecOps · Offensive Security",
+    "location": "Indonesia",
+    "clearance": "OSCP+ · eWPTX · eMAPT",
+    "since": 2020,
+    "portrait": "cv/portrait.jpg"
+  },
+  "profile": "Security engineer with a DevSecOps core: penetration testing, shift-left security, and pipeline enforcement at enterprise scale. I build the automated gates that catch risk before it ships, not after. Co-presented at Black Hat Asia 2020.",
+  "experience": [
+    {
+      "org": "GoTo Group",
+      "title": "Security Engineer, DevSecOps",
+      "period": "2022 – Present",
+      "start": "2022",
+      "end": "present",
+      "summary": "Own security enforcement across the delivery pipeline for an enterprise engineering estate.",
+      "points": [
+        "Engineered a merge-request security-gate enforcement layer on GitLab Premium, which ships no native external status checks, to block risky changes before they merge across thousands of active, non-standardized repositories.",
+        "Enforce automated Secret detection and Software Composition Analysis (SCA) in CI/CD today, with Static Application Security Testing (SAST) coverage rolling out next.",
+        "Build and maintain multiple security-tool integrations across the pipeline, tying detection, triage, and enforcement together through automated workflow orchestration.",
+        "Champion shift-left practices so vulnerabilities surface early in the lifecycle, where they are cheapest to fix and least disruptive to ship."
+      ]
+    },
+    {
+      "org": "PT Inovasi Informatika Indonesia",
+      "title": "Cyber Security Consultant",
+      "period": "2020 – 2022",
+      "start": "2020",
+      "end": "2022",
+      "summary": "Offensive security across client web apps, networks, and infrastructure.",
+      "points": [
+        "Performed comprehensive penetration tests on web applications, networks, and infrastructure to identify and report exploitable vulnerabilities.",
+        "Simulated real-world attacks, delivered actionable remediation guidance, and worked alongside engineering teams to strengthen their security posture."
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "code": "OSCP+",
+      "name": "Offensive Security Certified Professional",
+      "issuer": "OffSec",
+      "ref": "Verified credential",
+      "url": "https://pdf.credential.net/y7547i9i_1736388126748.pdf"
+    },
+    {
+      "code": "eWPTX v2",
+      "name": "Web Application Penetration Tester eXtreme 2.0",
+      "issuer": "INE / eLearnSecurity",
+      "ref": "ID 5040272",
+      "url": ""
+    },
+    {
+      "code": "eMAPT",
+      "name": "Mobile Application Penetration Tester",
+      "issuer": "INE / eLearnSecurity",
+      "ref": "ID 5313541",
+      "url": ""
+    }
+  ],
+  "skills": [
+    {
+      "group": "Application Security",
+      "items": ["SAST", "SCA", "Secret Detection", "Dependency Hygiene"]
+    },
+    {
+      "group": "Offensive",
+      "items": ["Web / Mobile / Network Pentesting", "Attack Simulation", "Remediation Guidance"]
+    },
+    {
+      "group": "DevSecOps / Pipeline",
+      "items": ["CI/CD Security Gates", "GitLab", "MR Enforcement", "Workflow Automation"]
+    },
+    {
+      "group": "Practices",
+      "items": ["Shift-Left", "Threat Modeling", "Security Posture Hardening"]
+    }
+  ],
+  "education": [
+    {
+      "org": "Bina Nusantara University",
+      "title": "Bachelor of Computer Science",
+      "period": "2016 – 2020"
+    }
+  ],
+  "languages": [
+    { "name": "Indonesian", "level": "Native" },
+    { "name": "English", "level": "Professional" }
+  ],
+  "highlights": [
+    { "label": "Speaker", "text": "Black Hat Asia 2020, co-presenter" }
+  ],
+  "contact": {
+    "email": "vandevlin.alfonso@gmail.com",
+    "linkedin": "https://id.linkedin.com/in/vandevlin-alfonso",
+    "linkedinLabel": "id.linkedin.com/in/vandevlin-alfonso"
+  }
+}

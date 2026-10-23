@@ -8,7 +8,7 @@
   "dateDisplay": "Saturday, September 12th, 2026",
   "quote": "And suddenly, all the love songs were about you.",
   "opener": {
-    "hint": "Two lives, one thread — pull them together"
+    "hint": "Two lives, one thread: pull them together"
   },
   "choice": {
     "groomLine": "Walk his years",
@@ -17,20 +17,20 @@
   "journeys": {
     "groom": [
       { "year": "1997", "title": "A loud arrival", "text": "Liam arrived two weeks early, mid-thunderstorm, already impatient for the good part.", "scene": "birth", "variant": "storm", "cameo": { "caption": "That warm glimmer low on the horizon? A girl arrives with the dawn, one year from now." } },
-      { "year": "2004", "title": "Paper pilot", "text": "Champion of paper planes off the school roof. Grounded twice. Worth it, he says.", "scene": "childhood", "variant": "planes", "cameo": { "caption": "The small figure on the far hill, jar in hand, collecting proof of a good day — that's her." } },
+      { "year": "2004", "title": "Paper pilot", "text": "Champion of paper planes off the school roof. Grounded twice. Worth it, he says.", "scene": "childhood", "variant": "planes", "cameo": { "caption": "The small figure on the far hill, jar in hand, collecting proof of a good day. That's her." } },
       { "year": "2013", "title": "The quiet years", "text": "Books, late buses, a notebook of half-finished songs nobody was allowed to read.", "scene": "school", "variant": "books", "cameo": { "caption": "That doodle isn't his ink. It blew in from a notebook three streets away." } },
       { "year": "2018", "title": "City windows", "text": "First job, sixth floor. He counted lit windows at night and wondered who was behind them.", "scene": "work", "variant": "windows", "cameo": { "caption": "One window across the street never went dark before midnight. Hers." } },
       { "year": "2019", "title": "Looking", "text": "He didn't know what he was looking for. He just kept a seat free, everywhere he went.", "scene": "searching", "variant": "seat", "cameo": { "caption": "She passed this exact lamp post four minutes before him. The city kept practicing." } }
     ],
     "bride": [
       { "year": "1998", "title": "Born under a kind moon", "text": "Sora arrived at dawn, unbothered, as if she already knew how this story ends.", "scene": "birth", "variant": "dawn", "cameo": { "caption": "The storm leaving on the horizon? It announced a boy, one year before her." } },
-      { "year": "2005", "title": "Collector of small things", "text": "Pressed flowers, bus tickets, bottle caps — anything that proved a good day happened.", "scene": "childhood", "variant": "collect", "cameo": { "caption": "The paper plane crossing her sky flew three rooftops to get there. Guess whose." } },
-      { "year": "2014", "title": "The margin artist", "text": "Every notebook she owned: half lessons, half doodles. The doodles aged better.", "scene": "school", "variant": "margins", "cameo": { "caption": "One note in the margin isn't hers — a half-finished song that drifted in." } },
+      { "year": "2005", "title": "Collector of small things", "text": "Pressed flowers, bus tickets, bottle caps: anything that proved a good day happened.", "scene": "childhood", "variant": "collect", "cameo": { "caption": "The paper plane crossing her sky flew three rooftops to get there. Guess whose." } },
+      { "year": "2014", "title": "The margin artist", "text": "Every notebook she owned: half lessons, half doodles. The doodles aged better.", "scene": "school", "variant": "margins", "cameo": { "caption": "One note in the margin isn't hers: a half-finished song that drifted in." } },
       { "year": "2018", "title": "Lights on late", "text": "Design school, then a studio job. Hers was the window still lit at midnight.", "scene": "work", "variant": "studio", "cameo": { "caption": "Across the street, someone counted lit windows every night. He always ended on hers." } },
       { "year": "2019", "title": "Almost", "text": "Three near-misses: same train, same café, same rainy bookshop. The city kept practicing.", "scene": "searching", "variant": "almost", "cameo": { "caption": "Same train, same café, same rainy bookshop. He was the blur in all three." } }
     ],
     "meeting": { "year": "2019", "title": "The borrowed pen", "text": "A lecture hall neither of them wanted to be in. One pen between them. The city finally got it right.", "scene": "meeting" },
-    "proposal": { "year": "2025", "title": "The question", "text": "Seven years after the borrowed pen, on a hill above the city that kept missing its cue — he asked. She said the easiest yes of her life.", "scene": "proposal" }
+    "proposal": { "year": "2025", "title": "The question", "text": "Seven years after the borrowed pen, on a hill above the city that kept missing its cue, he asked. She said the easiest yes of her life.", "scene": "proposal" }
   },
   "reveal": {
     "kicker": "And now, the next chapter",
@@ -43,8 +43,8 @@
     { "src": "gallery/g4.jpg", "caption": "Practicing the first dance, badly" }
   ],
   "events": [
-    { "name": "The Ceremony", "time": "09:00 — 11:00", "place": "Eden Garden Pavilion", "note": "Family & close friends" },
-    { "name": "The Reception", "time": "12:00 — 15:00", "place": "Eden Grand Hall", "note": "All guests welcome" }
+    { "name": "The Ceremony", "time": "09:00 – 11:00", "place": "Eden Garden Pavilion", "note": "Family & close friends" },
+    { "name": "The Reception", "time": "12:00 – 15:00", "place": "Eden Grand Hall", "note": "All guests welcome" }
   ],
   "venue": {
     "name": "Eden Gardens",
@@ -59,7 +59,7 @@
     { "name": "Dan", "side": "groom", "attending": true, "plusOnes": 0, "message": "The paper plane champion got the best landing of all. Proud of you, brother." },
     { "name": "Aunt Margot", "side": "bride", "attending": true, "plusOnes": 2, "message": "May your home be loud with laughter and your table always full." },
     { "name": "Kev", "side": "groom", "attending": false, "plusOnes": 0, "message": "Stuck overseas but cheering loudly from here. Save me a slice of everything." },
-    { "name": "Studio Eight", "side": "bride", "attending": true, "plusOnes": 0, "message": "To our midnight-window girl — may every light ahead be warm. Congratulations!" },
+    { "name": "Studio Eight", "side": "bride", "attending": true, "plusOnes": 0, "message": "To our midnight-window girl, may every light ahead be warm. Congratulations!" },
     { "name": "Mr. Harlan", "side": "groom", "attending": true, "plusOnes": 1, "message": "Two kind people, one kind life. Blessings to you both." }
   ],
   "closing": "With love, we can't wait to celebrate with you."

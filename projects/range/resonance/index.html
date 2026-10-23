@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>(function(){var d=document.documentElement,c=null;try{c=JSON.parse(localStorage.getItem('aob-theme'))}catch(e){}if(!c||!c.vars)c={"id":"devsecops","vars":{"--accent":"#2fb6c4","--accent-rgb":"47, 182, 196","--accent-ink":"#16757f"}};for(var k in c.vars)d.style.setProperty(k,c.vars[k]);d.setAttribute('data-lens',c.id)})();</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lens-tpl="Resonance · {title}">Resonance · Security as Code</title>
+  <meta name="description" content="A playable acoustic lock: tune a singing steel plate until its sand draws the key. Real Chladni physics, GPU sand, procedural sound.">
+  <style>
+    body { overflow: hidden; touch-action: none; }
+
+    #stage { position: fixed; inset: 0; z-index: 0; }
+    #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    /* Mode-driven visibility: body[data-mode] = attract | vault | studio | open */
+    .rz-layer {
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    body[data-mode="attract"] .show-attract,
+    body[data-mode="vault"] .show-vault,
+    body[data-mode="studio"] .show-studio,
+    body[data-mode="open"] .show-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .rz-btn {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      background: rgba(10, 10, 11, 0.55);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      color: var(--fg-dim);
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    }
+    .rz-btn:hover { color: var(--fg); border-color: var(--fg-dim); }
+    .rz-btn.primary { color: var(--accent); border-color: var(--accent); }
+    .rz-btn.primary:hover { background: var(--accent); color: var(--bg); }
+    .rz-btn.on { color: var(--accent); border-color: rgba(var(--accent-rgb), 0.5); }
+    .rz-btn[hidden] { display: none; }
+
+    /* ---------- Frame telemetry ---------- */
+    #telemetry { display: flex; gap: 20px; color: var(--fg-dim); text-align: right; }
+    #telemetry .t-label { color: var(--fg-faint); margin-right: 6px; }
+    #t-plate { color: var(--fg-dim); transition: color 0.3s ease; }
+    #t-plate.live { color: var(--accent); }
+    .rz-crumb { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); transition: color 0.3s ease, border-color 0.3s ease; }
+    .rz-crumb:hover { color: var(--accent); border-color: var(--accent); }
+    body:not([data-mode="vault"]) #telemetry .vault-only { display: none; }
+
+    /* ---------- Intro (attract) ---------- */
+    #rz-intro {
+      position: fixed;
+      left: var(--margin);
+      bottom: 11vh;
+      z-index: 20;
+      max-width: 520px;
+      transform: translateY(12px);
+    }
+    body[data-mode="attract"] #rz-intro { transform: translateY(0); }
+    #rz-intro h1 {
+      font-size: clamp(52px, 8.4vw, 118px);
+      font-weight: 700;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+    #rz-intro h1 .accent { color: var(--accent); }
+    .rz-kicker {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-bottom: 20px;
+    }
+    .rz-lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(15px, 1.35vw, 18px);
+      line-height: 1.6;
+      color: var(--fg-dim);
+      margin-bottom: 30px;
+    }
+    .rz-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    .rz-note { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-faint); }
+
+    /* ---------- Key card ---------- */
+    #rz-key {
+      position: fixed;
+      right: var(--margin);
+      top: 50%;
+      z-index: 20;
+      width: 212px;
+      transform: translate(12px, -50%);
+    }
+    body[data-mode="vault"] #rz-key { transform: translate(0, -50%); }
+    .rk-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 12px;
+    }
+    #rk-name { color: var(--accent); }
+    .rk-figure {
+      position: relative;
+      width: 212px;
+      height: 212px;
+      border: 1px solid var(--line);
+      background: rgba(10, 10, 11, 0.6);
+      backdrop-filter: blur(6px);
+    }
+    #rk-canvas { position: absolute; inset: 14px; width: calc(100% - 28px); height: calc(100% - 28px); }
+    .rk-figure svg { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; }
+    #rk-progress {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 0.12s linear;
+    }
+    .rk-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+    .rk-stats b { color: var(--fg); font-weight: 400; margin-left: 6px; }
+    .rk-hint {
+      margin-top: 14px;
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--fg-dim);
+    }
+
+    /* ---------- Keyring ---------- */
+    #rz-ring {
+      position: fixed;
+      left: var(--margin);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rz-slot { display: flex; align-items: center; gap: 12px; }
+    .rz-slot canvas {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      background: rgba(10, 10, 11, 0.5);
+      opacity: 0.45;
+      transition: opacity 0.4s ease, border-color 0.4s ease;
+    }
+    .rz-slot span { font-size: 9px; letter-spacing: 2px; color: var(--fg-faint); }
+    .rz-slot.current canvas { opacity: 0.8; border-color: var(--fg-dim); }
+    .rz-slot.current span { color: var(--fg); }
+    .rz-slot.done canvas { opacity: 1; border-color: rgba(var(--accent-rgb), 0.55); }
+    .rz-slot.done span { color: var(--accent); }
+    .rz-slot.just canvas { animation: slot-set 0.9s ease; }
+    @keyframes slot-set {
+      0% { transform: scale(1.35); box-shadow: 0 0 0 1px var(--accent), 0 0 24px rgba(var(--accent-rgb), 0.7); }
+      100% { transform: scale(1); box-shadow: none; }
+    }
+
+    /* ---------- Status ---------- */
+    #rz-status {
+      position: fixed;
+      top: 92px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      text-align: center;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #rz-status.flash { color: var(--accent); }
+
+    /* ---------- Tuning rail ---------- */
+    #rz-rail {
+      position: fixed;
+      left: var(--margin);
+      right: var(--margin);
+      bottom: 22px;
+      z-index: 20;
+    }
+    .rr-read {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+    #rr-hz { font-size: 13px; color: var(--fg); letter-spacing: 1px; min-width: 88px; }
+    #rr-mode { color: var(--accent); }
+    .rr-tip { flex: 1; text-align: right; }
+    .rr-buttons { display: flex; gap: 8px; }
+    .rr-buttons .rz-btn { padding: 8px 12px; font-size: 9px; }
+    #rr-canvas { display: block; width: 100%; height: 50px; cursor: ew-resize; touch-action: none; }
+    body.drive-locked .rr-tip .drive-tip { display: none; }
+
+    /* ---------- Vault open ---------- */
+    #rz-open {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(circle at 50% 50%, rgba(5, 5, 6, 0.35), rgba(5, 5, 6, 0.86));
+    }
+    #rz-open[hidden] { display: none; }
+    .ro-card {
+      width: min(560px, 100%);
+      border: 1px solid var(--line);
+      border-top: 1px solid var(--accent);
+      background: rgba(12, 12, 13, 0.94);
+      backdrop-filter: blur(10px);
+      padding: 42px 42px 36px;
+      animation: ro-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes ro-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .ro-card h2 { font-size: clamp(30px, 4.4vw, 48px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.02; margin-bottom: 18px; }
+    .ro-card p { font-family: var(--display); font-weight: 300; font-size: 15px; line-height: 1.65; color: var(--fg-dim); margin-bottom: 18px; }
+    .ro-meta { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
+    #ro-code { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 26px; }
+    #ro-code b { color: var(--accent); font-weight: 400; letter-spacing: 4px; }
+    .ro-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    @media (max-width: 900px) {
+      .frame-top .frame-id { display: none; }
+      .frame-top { justify-content: center; }
+      #rz-key { width: 104px; top: 64px; transform: translate(12px, 0); }
+      body[data-mode="vault"] #rz-key { transform: none; }
+      .rk-head { flex-direction: column; gap: 4px; margin-bottom: 8px; }
+      .rk-figure { width: 104px; height: 104px; }
+      #rk-canvas { inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); }
+      .rk-stats { flex-direction: column; gap: 4px; margin-top: 8px; }
+      .rk-hint { display: none; }
+      #rz-ring { top: auto; bottom: 112px; transform: none; flex-direction: row; gap: 6px; }
+      .rz-slot { flex-direction: column; gap: 4px; }
+      .rz-slot canvas { width: 28px; height: 28px; }
+      .rr-tip, #rz-scatter { display: none; }
+      .rr-read { gap: 14px; justify-content: space-between; }
+      .rr-buttons .rz-btn { padding: 8px 10px; letter-spacing: 1.5px; }
+      #rz-status { top: auto; bottom: 176px; white-space: normal; width: 86vw; }
+      #telemetry { display: none; }
+    }
+    @media (max-width: 900px) and (orientation: portrait) {
+      #rz-intro { bottom: 6vh; }
+    }
+  </style>
+  <script type="module" crossorigin src="../../../assets/rangeResonance-DdrYwDdA.js"></script>
+  <link rel="modulepreload" crossorigin href="../../../assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="../../../assets/Cursor-12wpnqhY.js">
+  <link rel="modulepreload" crossorigin href="../../../assets/Quality-TTk3dsl2.js">
+  <link rel="modulepreload" crossorigin href="../../../assets/three-core-B-BFjvfq.js">
+  <link rel="modulepreload" crossorigin href="../../../assets/PostProcessing-CupuAfwY.js">
+  <link rel="modulepreload" crossorigin href="../../../assets/glyph-GmXeSW2Z.js">
+  <link rel="stylesheet" crossorigin href="../../../assets/Cursor-CGBMp8Ou.css">
+</head>
+<body data-mode="attract">
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Hardware Acceleration Required</h1>
+      <p>This instrument needs WebGL. <a href="../">Back to the range</a>.</p>
+    </div>
+  </div>
+
+  <div id="stage"></div>
+
+  <header class="frame-top">
+    <div class="frame-id">
+      <div class="case-id" data-lens-tpl="{file} · Annex">System 0001 · Annex</div>
+      <div class="examiner"><a class="rz-crumb" href="../">Range</a> · Exercise 01</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="../../../" data-lens-tpl="{home}">Home</a>
+      <a href="../../" class="active">Projects</a>
+      <a href="../../../cv/">Dossier</a>
+      <a href="../../../writeups/">Writeups</a>
+    </nav>
+    <div id="telemetry" aria-hidden="true">
+      <div class="vault-only"><span class="t-label">Key</span><span id="t-key">01/07</span></div>
+      <div class="vault-only"><span class="t-label">Time</span><span id="t-time">00:00</span></div>
+      <div><span class="t-label">Plate</span><span id="t-plate">QUIET</span></div>
+    </div>
+  </header>
+
+  <section id="rz-intro" class="rz-layer show-attract">
+    <div class="sec-label" id="rz-eyebrow">Range · Exercise 01</div>
+    <h1>Reso<span class="accent">nance</span></h1>
+    <div class="rz-kicker" id="rz-kicker">Acoustic lock</div>
+    <p class="rz-lede" id="rz-lede"></p>
+    <div class="rz-actions">
+      <button class="rz-btn primary" id="rz-begin">Open the vault</button>
+      <button class="rz-btn" id="rz-continue" hidden>Continue</button>
+      <button class="rz-btn" id="rz-studio">Studio</button>
+    </div>
+    <div class="rz-note" id="rz-note">Sound on · headphones recommended</div>
+  </section>
+
+  <nav id="rz-ring" class="rz-layer show-vault show-open" aria-label="Keys"></nav>
+
+  <aside id="rz-key" class="rz-layer show-vault" aria-live="polite">
+    <div class="rk-head"><span id="rk-index">Key 01 / 07</span><span id="rk-name"></span></div>
+    <div class="rk-figure">
+      <canvas id="rk-canvas" width="320" height="320"></canvas>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <rect id="rk-progress" x="0" y="0" width="100" height="100" pathLength="1" vector-effect="non-scaling-stroke"></rect>
+      </svg>
+    </div>
+    <div class="rk-stats"><span>Match<b id="rk-match">0%</b></span><span>Tune<b id="rk-tune">0%</b></span></div>
+    <p class="rk-hint" id="rk-hint"></p>
+  </aside>
+
+  <div id="rz-status" class="rz-layer show-vault show-studio"></div>
+
+  <div id="rz-rail" class="rz-layer show-vault show-studio">
+    <div class="rr-read">
+      <span id="rr-hz">88.0 Hz</span>
+      <span id="rr-mode">Between modes</span>
+      <span class="rr-tip">Wheel or ← → to tune · Shift for fine · Drag up off the rail for a vernier<span class="drive-tip"> · Drag on the plate to move the drive</span></span>
+      <span class="rr-buttons">
+        <button class="rz-btn" id="rz-scatter">Scatter</button>
+        <button class="rz-btn" id="rz-sound">Sound: On</button>
+        <button class="rz-btn" id="rz-exit">Exit</button>
+      </span>
+    </div>
+    <canvas id="rr-canvas" aria-label="Tuning rail"></canvas>
+  </div>
+
+  <section id="rz-open" class="show-open" hidden>
+    <div class="ro-card">
+      <div class="sec-label">Vault · 07 / 07</div>
+      <h2 id="ro-title">The vault is open.</h2>
+      <p id="ro-body"></p>
+      <div class="ro-meta" id="ro-time"></div>
+      <div id="ro-code"></div>
+      <div class="ro-actions">
+        <button class="rz-btn primary" id="ro-switch" hidden>Switch lens</button>
+        <button class="rz-btn" id="rz-again">Run it again</button>
+        <button class="rz-btn" id="rz-open-studio">Studio</button>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

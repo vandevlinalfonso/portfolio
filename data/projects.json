@@ -1,57 +1,57 @@
 [
   {
     "id": "proj-001",
-    "title": "Payment Gateway Hardening",
-    "type": "cut",
-    "year": "2023",
-    "impact": "$2M daily volume secured",
-    "context": "Legacy payment system with no input validation, processing $2M daily transactions",
-    "threat": "SQL injection could expose 50K+ customer payment records and credentials",
-    "action": "Implemented parameterized queries, rate limiting, and real-time anomaly detection",
-    "tradeoff": "Increased latency by ~80ms per transaction; required rewriting 3 core modules"
+    "title": "Pipeline Security Gates",
+    "type": "pipeline",
+    "year": "2024",
+    "impact": "Vulnerabilities fail the build, not production",
+    "context": "Security review happened late, by hand, after code was already merged and often already shipped.",
+    "threat": "Issues found after release are expensive, disruptive, and land on whoever is on call, not on the author who introduced them.",
+    "action": "Wired automated security checks directly into the delivery pipeline so risky changes fail early, at the point they are cheapest to fix.",
+    "tradeoff": "Adds minutes to every build and demands the checks stay low-noise, or developers learn to ignore them."
   },
   {
     "id": "proj-002",
-    "title": "API Breach Containment",
-    "type": "bruise",
-    "year": "2023",
-    "impact": "4-hour emergency patch",
-    "context": "Active exploitation of authentication bypass discovered in production API",
-    "threat": "Attackers had extracted 12K records before detection; full database at risk",
-    "action": "Emergency patch deployed in 4 hours; implemented token rotation and session invalidation",
-    "tradeoff": "All users forcibly logged out; broke 3rd-party integrations for 48 hours"
+    "title": "Merge Request Guardrails",
+    "type": "gate",
+    "year": "2024",
+    "impact": "Risky diffs blocked before they merge",
+    "context": "Nothing systematically inspected a change for security problems between opening a request and merging it.",
+    "threat": "A single unreviewed diff can introduce an exposure that reaches production quietly and lives there for months.",
+    "action": "Every change is scanned as part of review; findings are summarized inline and merges are held until the risk is resolved or accepted.",
+    "tradeoff": "A blocked merge is friction; the guardrail has to be accurate enough that the friction is trusted, not resented."
   },
   {
     "id": "proj-003",
-    "title": "Infrastructure Segmentation",
-    "type": "burn",
-    "year": "2022",
-    "impact": "Zero-trust across the platform",
-    "context": "Monolithic cloud architecture with shared credentials across all services",
-    "threat": "Single compromised service would cascade to entire platform infrastructure",
-    "action": "Designed and deployed zero-trust network with microsegmentation and identity-based access",
-    "tradeoff": "18-month migration; temporary performance degradation; 40% increase in infrastructure cost"
+    "title": "Shift-Left Enablement",
+    "type": "enablement",
+    "year": "2023",
+    "impact": "Feedback in minutes, not weeks",
+    "context": "Developers only heard about security problems in a late audit, far from the code and the context that created them.",
+    "threat": "Late feedback means rework, missed deadlines, and a security team seen as a blocker rather than a partner.",
+    "action": "Moved fast, actionable security feedback into the tools developers already use, so problems surface while the code is still fresh.",
+    "tradeoff": "Requires investment in developer experience: bad tooling here erodes trust faster than no tooling at all."
   },
   {
     "id": "proj-004",
-    "title": "Supply Chain Audit",
-    "type": "cut",
-    "year": "2022",
-    "impact": "8 critical packages replaced",
-    "context": "Third-party dependency with undisclosed vulnerabilities in core authentication library",
-    "threat": "Backdoor in widely-used package could compromise admin access silently",
-    "action": "Full dependency audit, implemented SCA pipeline, replaced 8 critical packages",
-    "tradeoff": "Broke backward compatibility; 6 weeks of refactoring; delayed product launch"
+    "title": "Continuous Vulnerability Scanning",
+    "type": "scanning",
+    "year": "2023",
+    "impact": "Standing coverage instead of point-in-time checks",
+    "context": "Scans ran occasionally and manually, so coverage drifted the moment the code changed.",
+    "threat": "A vulnerability introduced the day after a scan could sit undetected until the next manual pass.",
+    "action": "Made static and dynamic analysis a continuous, automated part of the lifecycle so coverage tracks the code as it evolves.",
+    "tradeoff": "Continuous scanning generates volume; without tuning and triage it becomes noise that buries the real findings."
   },
   {
     "id": "proj-005",
-    "title": "Insider Threat Detection",
-    "type": "bruise",
-    "year": "2021",
-    "impact": "Exfiltration confirmed and stopped",
-    "context": "Privileged user with access to sensitive data exhibiting anomalous behavior patterns",
-    "threat": "Potential data exfiltration; unclear intent; legal and reputational risk",
-    "action": "Deployed behavioral analytics; confirmed unauthorized access; coordinated with legal for removal",
-    "tradeoff": "False positive rate of 15%; created tension with engineering team; morale impact"
+    "title": "Secrets & Dependency Hygiene",
+    "type": "hygiene",
+    "year": "2022",
+    "impact": "Leaked keys and stale packages caught at the door",
+    "context": "Credentials occasionally slipped into commits, and third-party dependencies aged silently past their safe-to-use window.",
+    "threat": "A single leaked key or known-vulnerable package is often all an attacker needs to get a foothold.",
+    "action": "Automated detection of committed secrets and vulnerable dependencies, blocking them from entering the codebase in the first place.",
+    "tradeoff": "False positives cost developer time; rotation and upgrades add maintenance the team has to actually commit to."
   }
 ]

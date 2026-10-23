@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>(function(){var d=document.documentElement,c=null;try{c=JSON.parse(localStorage.getItem('aob-theme'))}catch(e){}if(!c||!c.vars)c={"id":"devsecops","vars":{"--accent":"#2fb6c4","--accent-rgb":"47, 182, 196","--accent-ink":"#16757f"}};for(var k in c.vars)d.style.setProperty(k,c.vars[k]);d.setAttribute('data-lens',c.id)})();</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anatomy of a Breach</title>
-  <meta name="description" content="The case file of a security engineer. Every system is already compromised — the work is deciding how far it spreads.">
+  <title>DevSecOps · Security as Code</title>
+  <meta name="description" content="The working notes of a DevSecOps engineer. Security built into the pipeline, enforced early, holding the line before anything ships.">
   <style>
     #canvas-container {
       position: fixed;
@@ -275,13 +277,13 @@
       text-align: right;
     }
 
-    .case-row:hover {
+    .case-row:is(:hover, :focus-visible) {
       padding-left: 16px;
     }
 
-    .case-row:hover .c-title { color: var(--accent); }
+    .case-row:is(:hover, :focus-visible) .c-title { color: var(--accent); }
 
-    .case-row:hover .c-arrow {
+    .case-row:is(:hover, :focus-visible) .c-arrow {
       opacity: 1;
       transform: translateX(0);
     }
@@ -503,7 +505,7 @@
     @media (max-width: 900px) {
       #s-specimen .cols { grid-template-columns: 1fr; }
       #s-specimen .cols > div:first-child { grid-column: 1; }
-      .case-row { grid-template-columns: 48px minmax(0, 1fr) 56px; }
+      .case-row { grid-template-columns: 48px minmax(0, 1fr) auto; }
       .case-row .c-year, .case-row .c-arrow { display: none; }
     }
 
@@ -513,14 +515,16 @@
       section { padding: 14vh var(--margin); }
     }
   </style>
-  <script type="module" crossorigin src="/portfolio/assets/main-B8a_7Wj_.js"></script>
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/Cursor-C1SwI0fm.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/three-core-CYWnSrLN.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/gsap-core-C8pce-KX.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/AudioManager-CLPgCg6w.js">
-  <link rel="modulepreload" crossorigin href="/portfolio/assets/Quality-TTk3dsl2.js">
-  <link rel="stylesheet" crossorigin href="/portfolio/assets/Cursor-LzlWAB8F.css">
+  <script type="module" crossorigin src="./assets/main-o0GtW18Q.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="./assets/Cursor-12wpnqhY.js">
+  <link rel="modulepreload" crossorigin href="./assets/three-core-B-BFjvfq.js">
+  <link rel="modulepreload" crossorigin href="./assets/gsap-core-C8pce-KX.js">
+  <link rel="modulepreload" crossorigin href="./assets/TextScramble-DloupxSv.js">
+  <link rel="modulepreload" crossorigin href="./assets/AudioManager-BKaduczM.js">
+  <link rel="modulepreload" crossorigin href="./assets/Quality-TTk3dsl2.js">
+  <link rel="modulepreload" crossorigin href="./assets/PostProcessing-CupuAfwY.js">
+  <link rel="stylesheet" crossorigin href="./assets/Cursor-CGBMp8Ou.css">
 </head>
 <body>
   <div id="loading-screen">
@@ -533,14 +537,12 @@
 
   <div id="webgl-fallback">
     <div class="inner">
-      <h1>Evidence Unavailable</h1>
-      <p>This examination requires WebGL, which your browser does not support or has disabled.</p>
+      <h1>Interface Unavailable</h1>
+      <p data-lens-copy="fallbackBody">This view requires WebGL, which your browser does not support or has disabled.</p>
       <p>
-        The case files remain accessible:
-        <!-- TODO: replace with your real links -->
-        <a href="https://github.com/yourusername">GitHub</a> ·
-        <a href="https://linkedin.com/in/yourusername">LinkedIn</a> ·
-        <a href="mailto:your@email.com">Email</a>
+        The work remains accessible:
+        <a href="https://id.linkedin.com/in/vandevlin-alfonso" data-contact="linkedin">LinkedIn</a> ·
+        <a href="mailto:vandevlin.alfonso@gmail.com" data-contact="email">Email</a>
       </p>
     </div>
   </div>
@@ -549,20 +551,20 @@
 
   <div class="frame-top">
     <div class="frame-id">
-      <div class="case-id">Case File 0001 — Open Incident</div>
-      <!-- TODO: replace with your real name -->
-      <div class="examiner" id="portfolio-name">Examiner: ████████</div>
+      <div class="case-id" data-lens-copy="caseId">System 0001 · Continuous Defense</div>
+      <div class="examiner" id="portfolio-name">Engineer: Vandevlin Wibawa</div>
     </div>
     <nav class="frame-nav" aria-label="Pages">
-      <a href="./" class="active">Case File</a>
-      <a href="./writeups/">Writeups</a>
+      <a href="./" class="active" data-lens-tpl="{home}">Home</a>
       <a href="./projects/">Projects</a>
+      <a href="./cv/">Dossier</a>
+      <a href="./writeups/">Writeups</a>
     </nav>
     <div id="telemetry" aria-hidden="true">
-      <div><span class="t-label">Decay</span><span id="t-decay">30.0%</span></div>
+      <div><span class="t-label" data-lens-copy="telScalarLabel">Coverage</span><span id="t-decay">30.0%</span></div>
       <div><span class="t-label">Session</span><span id="t-session">00:00</span></div>
-      <div><span class="t-label">Cases</span><span id="t-wounds">0/—</span></div>
-      <div><span class="t-label">Specimen</span><span id="t-status">STABLE</span></div>
+      <div><span class="t-label">Cases</span><span id="t-wounds">0/··</span></div>
+      <div><span class="t-label" data-lens-copy="telSpecimenLabel">System</span><span id="t-status">STABLE</span></div>
     </div>
   </div>
 
@@ -572,70 +574,69 @@
 
   <main>
     <section id="s-hero" data-section="0" data-name="Index">
-      <div class="sec-label" data-reveal>Case File 0001 — Open Incident</div>
-      <h1 data-reveal>Anatomy<br>of a <span class="accent">Breach</span></h1>
-      <p class="hero-lede" data-reveal>
-        The case file of a security engineer. Every system I touch is already
-        compromised — the work is deciding how far it spreads.
+      <div class="sec-label" data-reveal data-lens-copy="heroEyebrow">System 0001 · Under Continuous Defense</div>
+      <h1 data-reveal data-lens-copy="heroTitle">Security<br>as <span class="accent">Code</span></h1>
+      <p class="hero-lede" data-reveal data-lens-copy="heroLede">
+        The working notes of a DevSecOps engineer. Security is not a gate at
+        the end: it is built into the pipeline, enforced early, and holds the
+        line before anything ships.
       </p>
-      <div class="hero-meta" data-reveal>
-        <span><b>Role</b> — Security / Infrastructure</span>
-        <span><b>Specimen</b> — Live, decaying</span>
-        <span><b>Status</b> — Accepting incidents</span>
+      <div class="hero-meta" data-reveal data-lens-copy="heroMeta">
+        <span><b>Role</b> · DevSecOps / Platform Security</span>
+        <span><b>Posture</b> · Shift-left, automated</span>
+        <span><b>Status</b> · Guarding the pipeline</span>
       </div>
-      <div class="scroll-cue">Begin examination ↓</div>
+      <div class="scroll-cue" data-lens-copy="scrollCue">Trace the pipeline ↓</div>
     </section>
 
     <section id="s-specimen" data-section="1" data-name="Specimen">
       <div class="cols">
         <div>
-          <div class="sec-label" data-reveal>01 — The Specimen</div>
-          <h2 data-reveal>The specimen never resets.</h2>
-          <p class="body-copy" data-reveal>
-            The artifact behind this text is the system under examination —
-            fractured, instrumented, decaying in real time. It rots while you
-            read. It rots while you are away. Every case you open leaves a
-            permanent scar that will still be here when you return.
+          <div class="sec-label" data-reveal data-lens-copy="specimenEyebrow">01 · The System</div>
+          <h2 data-reveal data-lens-copy="specimenTitle">Defense that never sleeps.</h2>
+          <p class="body-copy" data-reveal data-lens-copy="specimenBody1">
+            The machine behind this text is the gate every change must pass.
+            Raw strands stream in from the void, chaotic and untested, and the
+            aperture aligns them into one ordered braid. A flawed strand is
+            severed at the rim before it ever enters. Nothing flawed ships.
           </p>
-          <p class="body-copy" data-reveal>
-            That is the honest shape of security work. Nothing returns to
-            pristine. Systems accumulate consequence, and the job is not to
-            prevent every wound — it is to decide which damage you can live
-            with, and contain the rest.
+          <p class="body-copy" data-reveal data-lens-copy="specimenBody2">
+            That is the honest shape of DevSecOps. You do not chase a perfect,
+            finished state: you build the machine that catches problems
+            automatically, every commit, every day, so the humans can sleep.
           </p>
         </div>
       </div>
     </section>
 
     <section id="s-incidents" data-section="2" data-name="Incidents">
-      <div class="sec-label" data-reveal>02 — Incidents</div>
-      <h2 data-reveal>Five contained breaches.</h2>
-      <p class="sec-hint" data-reveal>
-        Hover to isolate the fragment · Open a case to read the report · What you examine stays marked
+      <div class="sec-label" data-reveal data-lens-copy="incidentsEyebrow">02 · Disciplines</div>
+      <h2 data-reveal data-lens-copy="incidentsTitle">Where security meets the pipeline.</h2>
+      <p class="sec-hint" data-reveal data-lens-copy="incidentsHint">
+        Hover to ignite a sector of the aperture · Open one to read the approach · What you review is sealed onto the ring
       </p>
       <div id="case-list"></div>
     </section>
 
     <section id="s-doctrine" data-section="3" data-name="Doctrine">
-      <div class="sec-label" data-reveal>03 — Doctrine</div>
+      <div class="sec-label" data-reveal data-lens-copy="doctrineEyebrow">03 · Doctrine</div>
       <div id="quote-list"></div>
     </section>
 
     <section id="s-contact" data-section="4" data-name="Contact">
-      <div class="sec-label" data-reveal>04 — Contact</div>
-      <!-- TODO: replace with your real email -->
-      <a id="contact-link" href="mailto:your@email.com" data-reveal>
+      <div class="sec-label" data-reveal data-lens-copy="contactEyebrow">04 · Contact</div>
+      <a id="contact-link" href="mailto:vandevlin.alfonso@gmail.com" data-contact="email" data-reveal data-lens-copy="contactLink">
         Open a<br>channel <span class="arrow">→</span>
       </a>
       <div id="socials" data-reveal></div>
       <div class="more-evidence" data-reveal>
-        <span class="sec-hint">Further evidence</span>
+        <span class="sec-hint" data-lens-copy="contactMoreHint">Further work</span>
         <a href="./writeups/">Machine Writeups →</a>
         <a href="./projects/">Interactive Works →</a>
       </div>
       <div class="footer-line" data-reveal>
-        <span>Examination complete — specimen retains all damage</span>
-        <span id="footer-decay">Decay at close: —</span>
+        <span data-lens-copy="contactFooterNote">Review complete · coverage holds</span>
+        <span id="footer-decay">Coverage at close: ··</span>
       </div>
     </section>
   </main>
@@ -647,19 +648,19 @@
     <div id="panel-meta"></div>
     <div class="panel-title" id="panel-title"></div>
     <div class="panel-section">
-      <div class="panel-label">Context</div>
+      <div class="panel-label" data-lens-copy="panelLabelContext">Context</div>
       <div class="panel-content" id="panel-context"></div>
     </div>
     <div class="panel-section">
-      <div class="panel-label">Threat</div>
+      <div class="panel-label" data-lens-copy="panelLabelThreat">Risk</div>
       <div class="panel-content" id="panel-threat"></div>
     </div>
     <div class="panel-section">
-      <div class="panel-label">Action</div>
+      <div class="panel-label" data-lens-copy="panelLabelAction">Control</div>
       <div class="panel-content" id="panel-action"></div>
     </div>
     <div class="panel-section">
-      <div class="panel-label">Tradeoff</div>
+      <div class="panel-label" data-lens-copy="panelLabelTradeoff">Tradeoff</div>
       <div class="panel-content" id="panel-tradeoff"></div>
     </div>
   </aside>

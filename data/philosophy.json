@@ -1,14 +1,14 @@
 [
   {
     "id": "phil-001",
-    "text": "Security is deciding which damage you're willing to live with, not achieving perfect safety."
+    "text": "Security that ships late is security that gets skipped. Move it left, make it automatic."
   },
   {
     "id": "phil-002",
-    "text": "Every system I touch is already compromised. My job is containment, not prevention."
+    "text": "The goal isn't a gate that says no. It's a pipeline that quietly catches the problem before anyone has to."
   },
   {
     "id": "phil-003",
-    "text": "The best defense accepts that the enemy is already inside. Design for graceful failure."
+    "text": "Every check should earn its place. Noise trains people to ignore the alarm that finally matters."
   }
 ]

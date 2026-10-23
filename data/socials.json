@@ -1,26 +1,14 @@
 [
   {
-    "id": "github",
-    "label": "GitHub – Code I'm willing to expose",
-    "url": "https://github.com/yourusername",
-    "icon": "github"
-  },
-  {
     "id": "linkedin",
     "label": "LinkedIn – Sanitized version of me",
-    "url": "https://linkedin.com/in/yourusername",
+    "url": "https://id.linkedin.com/in/vandevlin-alfonso",
     "icon": "linkedin"
   },
   {
     "id": "email",
     "label": "Email – Direct but delayed",
-    "url": "mailto:your@email.com",
+    "url": "mailto:vandevlin.alfonso@gmail.com",
     "icon": "email"
-  },
-  {
-    "id": "twitter",
-    "label": "X – Occasional signal in noise",
-    "url": "https://twitter.com/yourusername",
-    "icon": "twitter"
   }
 ]

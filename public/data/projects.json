@@ -1,0 +1,57 @@
+[
+  {
+    "id": "proj-001",
+    "title": "Pipeline Security Gates",
+    "type": "pipeline",
+    "year": "2024",
+    "impact": "Vulnerabilities fail the build, not production",
+    "context": "Security review happened late, by hand, after code was already merged and often already shipped.",
+    "threat": "Issues found after release are expensive, disruptive, and land on whoever is on call, not on the author who introduced them.",
+    "action": "Wired automated security checks directly into the delivery pipeline so risky changes fail early, at the point they are cheapest to fix.",
+    "tradeoff": "Adds minutes to every build and demands the checks stay low-noise, or developers learn to ignore them."
+  },
+  {
+    "id": "proj-002",
+    "title": "Merge Request Guardrails",
+    "type": "gate",
+    "year": "2024",
+    "impact": "Risky diffs blocked before they merge",
+    "context": "Nothing systematically inspected a change for security problems between opening a request and merging it.",
+    "threat": "A single unreviewed diff can introduce an exposure that reaches production quietly and lives there for months.",
+    "action": "Every change is scanned as part of review; findings are summarized inline and merges are held until the risk is resolved or accepted.",
+    "tradeoff": "A blocked merge is friction; the guardrail has to be accurate enough that the friction is trusted, not resented."
+  },
+  {
+    "id": "proj-003",
+    "title": "Shift-Left Enablement",
+    "type": "enablement",
+    "year": "2023",
+    "impact": "Feedback in minutes, not weeks",
+    "context": "Developers only heard about security problems in a late audit, far from the code and the context that created them.",
+    "threat": "Late feedback means rework, missed deadlines, and a security team seen as a blocker rather than a partner.",
+    "action": "Moved fast, actionable security feedback into the tools developers already use, so problems surface while the code is still fresh.",
+    "tradeoff": "Requires investment in developer experience: bad tooling here erodes trust faster than no tooling at all."
+  },
+  {
+    "id": "proj-004",
+    "title": "Continuous Vulnerability Scanning",
+    "type": "scanning",
+    "year": "2023",
+    "impact": "Standing coverage instead of point-in-time checks",
+    "context": "Scans ran occasionally and manually, so coverage drifted the moment the code changed.",
+    "threat": "A vulnerability introduced the day after a scan could sit undetected until the next manual pass.",
+    "action": "Made static and dynamic analysis a continuous, automated part of the lifecycle so coverage tracks the code as it evolves.",
+    "tradeoff": "Continuous scanning generates volume; without tuning and triage it becomes noise that buries the real findings."
+  },
+  {
+    "id": "proj-005",
+    "title": "Secrets & Dependency Hygiene",
+    "type": "hygiene",
+    "year": "2022",
+    "impact": "Leaked keys and stale packages caught at the door",
+    "context": "Credentials occasionally slipped into commits, and third-party dependencies aged silently past their safe-to-use window.",
+    "threat": "A single leaked key or known-vulnerable package is often all an attacker needs to get a foothold.",
+    "action": "Automated detection of committed secrets and vulnerable dependencies, blocking them from entering the codebase in the first place.",
+    "tradeoff": "False positives cost developer time; rotation and upgrades add maintenance the team has to actually commit to."
+  }
+]

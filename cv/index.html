@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personnel File · Vandevlin Wibawa</title>
+  <meta name="description" content="Curriculum vitae of Vandevlin Wibawa, Security Engineer (DevSecOps). Presented as a forensic personnel dossier. Downloadable as PDF.">
+  <style>
+    /* ---------- Ambient field host ---------- */
+    #field-host {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    #field-host canvas { position: absolute; inset: 0; }
+
+    /* Scrim so dense content fades cleanly under the fixed HUD */
+    .frame-top::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 -34px 0;
+      background: linear-gradient(180deg, var(--bg) 46%, rgba(10, 10, 11, 0.82) 74%, transparent);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ---------- Telemetry (mirrors Home) ---------- */
+    #telemetry {
+      display: flex;
+      gap: 20px;
+      color: var(--fg-dim);
+      text-align: right;
+    }
+    #telemetry .t-label { color: var(--fg-faint); margin-right: 6px; }
+    #t-clear { color: var(--accent); }
+    #t-stat { color: #7da87d; }
+
+    /* ---------- Document shell ---------- */
+    main.cv-doc {
+      position: relative;
+      z-index: 2;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 132px var(--margin) 120px;
+      display: grid;
+      grid-template-columns: minmax(288px, 348px) minmax(0, 1fr);
+      gap: clamp(36px, 5.4vw, 92px);
+      align-items: start;
+    }
+
+    /* ---------- Aside / identity ---------- */
+    .cv-aside {
+      position: sticky;
+      top: 132px;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .portrait-card {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    #portrait-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .print-portrait, .print-portrait-light { display: none; }
+
+    .portrait-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .portrait-tag .live { color: var(--accent); }
+    .portrait-card::after {
+      /* corner registration marks */
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--accent), var(--accent)) top left,
+        linear-gradient(var(--accent), var(--accent)) top left,
+        linear-gradient(var(--accent), var(--accent)) bottom right,
+        linear-gradient(var(--accent), var(--accent)) bottom right;
+      background-size: 12px 1px, 1px 12px;
+      background-repeat: no-repeat;
+      background-position: top left, top left, bottom right, bottom right;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .identity .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .identity h1 {
+      font-size: clamp(30px, 3.4vw, 46px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+    }
+    .identity .role {
+      font-family: var(--display);
+      font-weight: 300;
+      text-transform: none;
+      font-size: 16px;
+      color: var(--fg-dim);
+      margin-top: 14px;
+    }
+    .identity .meta {
+      margin-top: 12px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .id-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line);
+    }
+    .id-stats > div { padding: 14px 16px; }
+    .id-stats > div + div { border-left: 1px solid var(--line); }
+    .id-stats .n {
+      font-family: var(--display);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--fg);
+      line-height: 1;
+    }
+    .id-stats .k {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-top: 8px;
+    }
+
+    .clearance {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .clearance span {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      border: 1px solid var(--line);
+      padding: 6px 10px;
+    }
+
+    .id-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+    .id-contact a {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--fg-dim);
+      text-decoration: none;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      transition: color 0.3s ease;
+    }
+    .id-contact a:hover { color: var(--fg); }
+    .id-contact a .ck {
+      color: var(--fg-faint);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 9px;
+      min-width: 62px;
+    }
+
+    .dl-head {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 8px;
+    }
+    .dl-opts { display: flex; gap: 8px; }
+    .dl-btn {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 13px 10px;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .dl-btn:hover { background: var(--accent); color: var(--bg); }
+
+    /* ---------- Record column ---------- */
+    .cv-record { display: flex; flex-direction: column; gap: clamp(48px, 6vw, 84px); }
+
+    .rec-block .sec-label { margin-bottom: 20px; }
+
+    .rec-block .lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(18px, 1.9vw, 25px);
+      line-height: 1.55;
+      color: var(--fg);
+      max-width: 30em;
+      letter-spacing: -0.01em;
+    }
+
+    /* Service record timeline */
+    .roles { display: flex; flex-direction: column; }
+    .role {
+      position: relative;
+      padding: 0 0 40px 34px;
+      border-left: 1px solid var(--line);
+    }
+    .role:last-child { padding-bottom: 0; }
+    .role::before {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 6px;
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px var(--bg);
+    }
+    .role .period {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .role .org {
+      font-family: var(--display);
+      font-size: clamp(21px, 2.4vw, 30px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+    .role .title {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--fg-dim);
+      margin-top: 4px;
+    }
+    .role ul { list-style: none; margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .role li {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(14px, 1.15vw, 16px);
+      line-height: 1.6;
+      color: var(--fg-dim);
+      max-width: 44em;
+      position: relative;
+      padding-left: 20px;
+    }
+    .role li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+      top: 2px;
+    }
+
+    /* Clearances / certifications */
+    .certs { border-top: 1px solid var(--line); }
+    .cert {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding: 20px 0;
+    }
+    .cert .code {
+      font-family: var(--display);
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .cert .cname { font-family: var(--display); font-weight: 300; font-size: 15px; color: var(--fg-dim); }
+    .cert .cissuer { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg-faint); margin-top: 5px; }
+    .cert .cref {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--fg-faint);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.3s ease;
+    }
+    .cert a.cref:hover { color: var(--accent); }
+
+    /* Skills */
+    .skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
+    .skill-grp .gk {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .skill-grp .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .skill-grp .chips span {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--fg-dim);
+      border: 1px solid var(--line);
+      padding: 6px 9px;
+    }
+
+    /* Two-up footer (education / languages) */
+    .two-up { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(36px, 5vw, 72px); }
+    .mini-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-top: 1px solid var(--line); padding: 16px 0; }
+    .mini-row:last-child { border-bottom: 1px solid var(--line); }
+    .mini-row .mt { font-family: var(--display); font-weight: 500; font-size: 15px; text-transform: uppercase; letter-spacing: -0.005em; }
+    .mini-row .ms { font-family: var(--display); font-weight: 300; font-size: 13px; color: var(--fg-dim); }
+    .mini-row .mr { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg-faint); text-align: right; }
+
+    .doc-footer {
+      grid-column: 1 / -1;
+      margin-top: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    [data-reveal] { will-change: transform, opacity; }
+    #boot-log .err { color: var(--accent); }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      main.cv-doc { grid-template-columns: 1fr; gap: 48px; padding-top: 108px; }
+      .cv-aside { position: static; top: auto; }
+      .portrait-card { max-width: 340px; }
+    }
+    @media (max-width: 768px) {
+      #telemetry { display: none; }
+      .cert { grid-template-columns: 92px minmax(0,1fr); }
+      .cert .cref { grid-column: 2; }
+    }
+
+    /* ================= PRINT / PDF (dark dossier — matches the screen) =========== */
+    @media print {
+      @page { size: A4; margin: 0; }
+      html, body { background: #0a0a0b !important; color: var(--fg) !important; }
+      body.has-custom-cursor, body.has-custom-cursor * { cursor: auto !important; }
+      #field-host, #cursor-dot, #cursor-ring, .frame-top, #loading-screen,
+      #webgl-fallback, #portrait-canvas, .portrait-tag, .dl-block { display: none !important; }
+
+      main.cv-doc {
+        display: grid !important;
+        grid-template-columns: 52mm 1fr;
+        gap: 11mm;
+        padding: 15mm 14mm !important;
+        max-width: none;
+        background: #0a0a0b;
+      }
+      .cv-aside { position: static !important; gap: 7mm; }
+      .cv-record { gap: 8.5mm !important; }
+      .rec-block { margin: 0 !important; }
+      .rec-block .sec-label { margin-bottom: 4.5mm !important; }
+
+      /* the shader-keyed duotone portrait, captured to a still image */
+      .portrait-card { aspect-ratio: 4/5; border: 0.5pt solid var(--line); background: #0a0a0b; }
+      .print-portrait { display: block !important; width: 100%; height: 100%; object-fit: cover; }
+      .print-portrait-light { display: none !important; }
+
+      .identity h1 { font-size: 23pt !important; }
+      .id-contact { gap: 3mm !important; padding-top: 4mm !important; }
+      .id-contact a { font-size: 8pt !important; letter-spacing: 0; overflow-wrap: anywhere; word-break: normal; }
+      .id-contact a .ck { min-width: 54px !important; white-space: nowrap; }
+
+      .role { padding-bottom: 6mm !important; }
+      .role ul { margin-top: 3.5mm !important; gap: 2.5mm !important; }
+      .role::before { box-shadow: 0 0 0 3pt #0a0a0b !important; }
+
+      .role, .cert, .skill-grp { break-inside: avoid; }
+      .rec-block .sec-label { break-after: avoid; }
+      .two-up { grid-template-columns: repeat(3, 1fr) !important; gap: 7mm !important; }
+      .skill-grid { gap: 7mm !important; }
+      .doc-footer { margin-top: 9mm !important; }
+
+      a { text-decoration: none; }
+      [data-reveal] { opacity: 1 !important; transform: none !important; }
+      main.cv-doc[hidden] { display: grid !important; }
+
+      /* -------- Light "paper" variant (html.pdf-light) -------- */
+      html.pdf-light, html.pdf-light body { background: #ffffff !important; color: #14100f !important; }
+      html.pdf-light { --line: rgba(20, 16, 15, 0.16); }
+      html.pdf-light main.cv-doc { background: #ffffff !important; }
+
+      html.pdf-light .print-portrait { display: none !important; }
+      html.pdf-light .print-portrait-light {
+        display: block !important; width: 100%; height: 100%; object-fit: cover;
+        filter: grayscale(0.12) contrast(1.03);
+      }
+      html.pdf-light .portrait-card { background: #ffffff !important; border-color: #cbb7b3 !important; }
+      html.pdf-light .role::before { box-shadow: 0 0 0 3pt #ffffff !important; }
+
+      html.pdf-light .identity .eyebrow, html.pdf-light .role .period,
+      html.pdf-light .cert a.cref, html.pdf-light .sec-label { color: var(--accent-ink) !important; }
+      html.pdf-light .identity h1, html.pdf-light .id-stats .n, html.pdf-light .role .org,
+      html.pdf-light .cert .code, html.pdf-light .mini-row .mt, html.pdf-light .identity .meta,
+      html.pdf-light .id-stats .k, html.pdf-light .clearance span, html.pdf-light .skill-grp .gk,
+      html.pdf-light .skill-grp .chips span, html.pdf-light .cert .cissuer, html.pdf-light .cert .cref,
+      html.pdf-light .mini-row .mr, html.pdf-light .id-contact a, html.pdf-light .doc-footer {
+        color: #14100f !important;
+      }
+      html.pdf-light .identity .role, html.pdf-light .rec-block .lede, html.pdf-light .role .title,
+      html.pdf-light .role li, html.pdf-light .cert .cname, html.pdf-light .mini-row .ms { color: #3a3330 !important; }
+      html.pdf-light .id-contact a .ck { color: #8a7d79 !important; }
+    }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="boot">
+      <div class="boot-header">Personnel Runtime v2.0.0</div>
+      <div id="boot-log"></div>
+      <div class="boot-progress"><div id="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Interface Unavailable</h1>
+      <p>This dossier renders best with WebGL. The record remains readable, and the PDF is available:
+        <a href="#" id="fallback-download">Download CV</a>.</p>
+    </div>
+  </div>
+
+  <div id="field-host"></div>
+
+  <header class="frame-top">
+    <div class="frame-id">
+      <div class="case-id">File 0002 · Personnel</div>
+      <div class="examiner" id="frame-name">Vandevlin Wibawa</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="../" data-lens-tpl="{home}">Home</a>
+      <a href="../projects/">Projects</a>
+      <a href="./" class="active">Dossier</a>
+      <a href="../writeups/">Writeups</a>
+    </nav>
+    <div id="telemetry" aria-hidden="true">
+      <div><span class="t-label">Clearance</span><span id="t-clear">··</span></div>
+      <div><span class="t-label">Service</span><span id="t-years">··</span></div>
+      <div><span class="t-label">Status</span><span id="t-stat">ACTIVE</span></div>
+    </div>
+  </header>
+
+  <main class="cv-doc" id="cv-doc" hidden>
+    <aside class="cv-aside">
+      <div class="portrait-card">
+        <div class="portrait-tag"><span>ID / VERIFIED</span><span class="live">● REC</span></div>
+        <canvas id="portrait-canvas"></canvas>
+        <img class="print-portrait" id="print-portrait" alt="Portrait of Vandevlin Wibawa">
+        <img class="print-portrait-light" id="print-portrait-light" alt="Portrait of Vandevlin Wibawa">
+      </div>
+
+      <div class="identity">
+        <div class="eyebrow" id="id-role">Security Engineer</div>
+        <h1 id="id-name">Vandevlin Wibawa</h1>
+        <div class="role" id="id-disc">DevSecOps · Offensive Security</div>
+        <div class="meta" id="id-meta"></div>
+      </div>
+
+      <div class="id-stats" id="id-stats"></div>
+
+      <div class="clearance" id="id-clearance"></div>
+
+      <div class="dl-block">
+        <div class="dl-head">Download CV</div>
+        <div class="dl-opts">
+          <button class="dl-btn" id="dl-dark" type="button">↓ Dark</button>
+          <button class="dl-btn" id="dl-light" type="button">↓ Light</button>
+        </div>
+      </div>
+
+      <div class="id-contact" id="id-contact"></div>
+    </aside>
+
+    <div class="cv-record" id="cv-record"></div>
+  </main>
+
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <script type="module" src="/src/cv.js"></script>
+</body>
+</html>

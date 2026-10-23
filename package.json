@@ -1,0 +1,22 @@
+{
+  "name": "anatomy-of-breach-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/caveat": "^5.2.8",
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/space-grotesk": "^5.2.10",
+    "gsap": "^3.12.5",
+    "marked": "^18.0.5",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.11"
+  }
+}

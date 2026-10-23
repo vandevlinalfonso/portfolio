@@ -1,0 +1,14 @@
+[
+  {
+    "id": "linkedin",
+    "label": "LinkedIn – Sanitized version of me",
+    "url": "https://id.linkedin.com/in/vandevlin-alfonso",
+    "icon": "linkedin"
+  },
+  {
+    "id": "email",
+    "label": "Email – Direct but delayed",
+    "url": "mailto:vandevlin.alfonso@gmail.com",
+    "icon": "email"
+  }
+]

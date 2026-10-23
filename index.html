@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevSecOps · Security as Code</title>
+  <meta name="description" content="The working notes of a DevSecOps engineer. Security built into the pipeline, enforced early, holding the line before anything ships.">
+  <style>
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---------- Telemetry ---------- */
+
+    #telemetry {
+      display: flex;
+      gap: 20px;
+      color: var(--fg-dim);
+      text-align: right;
+    }
+
+    #telemetry .t-label {
+      color: var(--fg-faint);
+      margin-right: 6px;
+    }
+
+    #t-decay { color: var(--fg); transition: color 0.6s ease; }
+    #t-decay.critical { color: var(--accent); }
+    #t-status { color: #7da87d; }
+
+    #t-status.degrading {
+      color: var(--accent);
+      animation: status-blink 1s steps(2, start) infinite;
+    }
+
+    @keyframes status-blink {
+      50% { opacity: 0.3; }
+    }
+
+    /* Section index, right edge */
+    #section-nav {
+      position: fixed;
+      right: var(--margin);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: right;
+    }
+
+    #section-nav button {
+      background: none;
+      border: none;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--fg-faint);
+      cursor: pointer;
+      padding: 2px 0;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    #section-nav button .nav-label {
+      opacity: 0;
+      transform: translateX(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    #section-nav button:hover .nav-label,
+    #section-nav button.active .nav-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #section-nav button.active {
+      color: var(--accent);
+    }
+
+    #sound-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: var(--margin);
+      z-index: 50;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--fg-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease, transform 0.25s ease-out;
+      will-change: transform;
+    }
+
+    #sound-toggle:hover { color: var(--fg); border-color: var(--fg-dim); }
+    #sound-toggle.on { color: var(--accent); border-color: var(--accent); }
+
+    /* ---------- Content sections ---------- */
+
+    main {
+      position: relative;
+      z-index: 2;
+    }
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18vh var(--margin);
+      max-width: 1560px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ---------- 00 Hero ---------- */
+
+    #s-hero h1 {
+      font-size: clamp(56px, 11vw, 152px);
+      font-weight: 700;
+      line-height: 0.94;
+      letter-spacing: -0.025em;
+      margin-bottom: 40px;
+    }
+
+    #s-hero h1 .accent { color: var(--accent); }
+
+    .hero-lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(16px, 1.6vw, 21px);
+      line-height: 1.55;
+      color: var(--fg-dim);
+      max-width: 540px;
+    }
+
+    .hero-meta {
+      margin-top: 48px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span b { color: var(--fg-dim); font-weight: 400; }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 40px;
+      left: var(--margin);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      animation: cue-pulse 2.6s ease-in-out infinite;
+    }
+
+    #s-hero { position: relative; }
+
+    @keyframes cue-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.85; }
+    }
+
+    /* ---------- Shared section type ---------- */
+
+    h2 {
+      font-size: clamp(34px, 5.6vw, 80px);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      margin-bottom: 36px;
+      max-width: 14em;
+    }
+
+    .body-copy {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(15px, 1.4vw, 19px);
+      line-height: 1.65;
+      color: var(--fg-dim);
+      max-width: 560px;
+    }
+
+    .body-copy + .body-copy { margin-top: 24px; }
+
+    .sec-hint {
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    /* ---------- 01 Specimen: two-column ---------- */
+
+    #s-specimen .cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 48px;
+    }
+
+    #s-specimen .cols > div:first-child { grid-column: 2; }
+
+    /* ---------- 02 Incidents: case rows ---------- */
+
+    #case-list {
+      margin-top: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .case-row {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) 130px 80px 56px;
+      align-items: baseline;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--line);
+      padding: 26px 0;
+      cursor: pointer;
+      color: var(--fg);
+      font-family: var(--mono);
+      transition: padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .case-row .c-idx {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--fg-faint);
+    }
+
+    .case-row .c-title {
+      font-family: var(--display);
+      font-size: clamp(20px, 2.6vw, 38px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+      padding-right: 24px;
+    }
+
+    .case-row .c-class,
+    .case-row .c-year {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    .case-row .c-arrow {
+      font-family: var(--display);
+      font-size: 20px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-align: right;
+    }
+
+    .case-row:is(:hover, :focus-visible) {
+      padding-left: 16px;
+    }
+
+    .case-row:is(:hover, :focus-visible) .c-title { color: var(--accent); }
+
+    .case-row:is(:hover, :focus-visible) .c-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .case-row.examined .c-idx::after {
+      content: ' ●';
+      color: var(--accent);
+    }
+
+    /* ---------- 03 Doctrine ---------- */
+
+    .quote {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(24px, 3.8vw, 54px);
+      line-height: 1.18;
+      letter-spacing: -0.015em;
+      color: var(--fg);
+      max-width: 18em;
+      margin-bottom: 9vh;
+      display: flex;
+      gap: 28px;
+    }
+
+    .quote:last-child { margin-bottom: 0; }
+
+    .quote .q-idx {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      padding-top: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- 04 Contact ---------- */
+
+    #contact-link {
+      font-family: var(--display);
+      font-size: clamp(44px, 8.5vw, 120px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--fg);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 56px;
+      transition: color 0.3s ease;
+    }
+
+    #contact-link:hover { color: var(--accent); }
+
+    #contact-link .arrow { color: var(--accent); }
+
+    #socials {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin-bottom: 96px;
+    }
+
+    #socials a {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #socials a:hover {
+      color: var(--fg);
+      border-color: var(--accent);
+    }
+
+    .more-evidence {
+      display: flex;
+      align-items: baseline;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .more-evidence .sec-hint { margin: 0; }
+
+    .more-evidence a {
+      font-family: var(--display);
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .more-evidence a:hover { color: var(--accent); }
+
+    .footer-line {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    /* ---------- Case panel (right sheet) ---------- */
+
+    #panel-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(5, 5, 6, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    #project-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(540px, 100vw);
+      background: rgba(12, 12, 13, 0.97);
+      border-left: 1px solid var(--line);
+      padding: 96px 48px 48px;
+      z-index: 100;
+      overflow-y: auto;
+      transform: translateX(101%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(14px);
+    }
+
+    body.panel-open #project-panel { transform: translateX(0); }
+
+    body.panel-open #panel-scrim {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .panel-close {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+
+    .panel-close:hover { opacity: 1; }
+
+    .panel-close::before,
+    .panel-close::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--fg);
+    }
+
+    .panel-close::before { transform: rotate(45deg); }
+    .panel-close::after { transform: rotate(-45deg); }
+
+    #panel-meta {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .panel-title {
+      font-family: var(--display);
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+      margin-bottom: 40px;
+    }
+
+    .panel-section {
+      margin-bottom: 26px;
+      padding-left: 16px;
+      border-left: 1px solid var(--line);
+    }
+
+    .panel-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 8px;
+    }
+
+    .panel-content {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--fg-dim);
+    }
+
+    /* ---------- Responsive ---------- */
+
+    @media (max-width: 900px) {
+      #s-specimen .cols { grid-template-columns: 1fr; }
+      #s-specimen .cols > div:first-child { grid-column: 1; }
+      .case-row { grid-template-columns: 48px minmax(0, 1fr) auto; }
+      .case-row .c-year, .case-row .c-arrow { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      #telemetry { display: none; }
+      #section-nav { display: none; }
+      section { padding: 14vh var(--margin); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="boot">
+      <div class="boot-header">Forensic Runtime v3.0.0</div>
+      <div id="boot-log"></div>
+      <div class="boot-progress"><div id="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Interface Unavailable</h1>
+      <p data-lens-copy="fallbackBody">This view requires WebGL, which your browser does not support or has disabled.</p>
+      <p>
+        The work remains accessible:
+        <a href="https://id.linkedin.com/in/vandevlin-alfonso" data-contact="linkedin">LinkedIn</a> ·
+        <a href="mailto:vandevlin.alfonso@gmail.com" data-contact="email">Email</a>
+      </p>
+    </div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <div class="frame-top">
+    <div class="frame-id">
+      <div class="case-id" data-lens-copy="caseId">System 0001 · Continuous Defense</div>
+      <div class="examiner" id="portfolio-name">Engineer: Vandevlin Wibawa</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="./" class="active" data-lens-tpl="{home}">Home</a>
+      <a href="./projects/">Projects</a>
+      <a href="./cv/">Dossier</a>
+      <a href="./writeups/">Writeups</a>
+    </nav>
+    <div id="telemetry" aria-hidden="true">
+      <div><span class="t-label" data-lens-copy="telScalarLabel">Coverage</span><span id="t-decay">30.0%</span></div>
+      <div><span class="t-label">Session</span><span id="t-session">00:00</span></div>
+      <div><span class="t-label">Cases</span><span id="t-wounds">0/··</span></div>
+      <div><span class="t-label" data-lens-copy="telSpecimenLabel">System</span><span id="t-status">STABLE</span></div>
+    </div>
+  </div>
+
+  <nav id="section-nav" aria-label="Sections"></nav>
+
+  <button id="sound-toggle" aria-label="Toggle sound">Sound: Off</button>
+
+  <main>
+    <section id="s-hero" data-section="0" data-name="Index">
+      <div class="sec-label" data-reveal data-lens-copy="heroEyebrow">System 0001 · Under Continuous Defense</div>
+      <h1 data-reveal data-lens-copy="heroTitle">Security<br>as <span class="accent">Code</span></h1>
+      <p class="hero-lede" data-reveal data-lens-copy="heroLede">
+        The working notes of a DevSecOps engineer. Security is not a gate at
+        the end: it is built into the pipeline, enforced early, and holds the
+        line before anything ships.
+      </p>
+      <div class="hero-meta" data-reveal data-lens-copy="heroMeta">
+        <span><b>Role</b> · DevSecOps / Platform Security</span>
+        <span><b>Posture</b> · Shift-left, automated</span>
+        <span><b>Status</b> · Guarding the pipeline</span>
+      </div>
+      <div class="scroll-cue" data-lens-copy="scrollCue">Trace the pipeline ↓</div>
+    </section>
+
+    <section id="s-specimen" data-section="1" data-name="Specimen">
+      <div class="cols">
+        <div>
+          <div class="sec-label" data-reveal data-lens-copy="specimenEyebrow">01 · The System</div>
+          <h2 data-reveal data-lens-copy="specimenTitle">Defense that never sleeps.</h2>
+          <p class="body-copy" data-reveal data-lens-copy="specimenBody1">
+            The machine behind this text is the gate every change must pass.
+            Raw strands stream in from the void, chaotic and untested, and the
+            aperture aligns them into one ordered braid. A flawed strand is
+            severed at the rim before it ever enters. Nothing flawed ships.
+          </p>
+          <p class="body-copy" data-reveal data-lens-copy="specimenBody2">
+            That is the honest shape of DevSecOps. You do not chase a perfect,
+            finished state: you build the machine that catches problems
+            automatically, every commit, every day, so the humans can sleep.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="s-incidents" data-section="2" data-name="Incidents">
+      <div class="sec-label" data-reveal data-lens-copy="incidentsEyebrow">02 · Disciplines</div>
+      <h2 data-reveal data-lens-copy="incidentsTitle">Where security meets the pipeline.</h2>
+      <p class="sec-hint" data-reveal data-lens-copy="incidentsHint">
+        Hover to ignite a sector of the aperture · Open one to read the approach · What you review is sealed onto the ring
+      </p>
+      <div id="case-list"></div>
+    </section>
+
+    <section id="s-doctrine" data-section="3" data-name="Doctrine">
+      <div class="sec-label" data-reveal data-lens-copy="doctrineEyebrow">03 · Doctrine</div>
+      <div id="quote-list"></div>
+    </section>
+
+    <section id="s-contact" data-section="4" data-name="Contact">
+      <div class="sec-label" data-reveal data-lens-copy="contactEyebrow">04 · Contact</div>
+      <a id="contact-link" href="mailto:vandevlin.alfonso@gmail.com" data-contact="email" data-reveal data-lens-copy="contactLink">
+        Open a<br>channel <span class="arrow">→</span>
+      </a>
+      <div id="socials" data-reveal></div>
+      <div class="more-evidence" data-reveal>
+        <span class="sec-hint" data-lens-copy="contactMoreHint">Further work</span>
+        <a href="./writeups/">Machine Writeups →</a>
+        <a href="./projects/">Interactive Works →</a>
+      </div>
+      <div class="footer-line" data-reveal>
+        <span data-lens-copy="contactFooterNote">Review complete · coverage holds</span>
+        <span id="footer-decay">Coverage at close: ··</span>
+      </div>
+    </section>
+  </main>
+
+  <div id="panel-scrim"></div>
+
+  <aside id="project-panel" aria-hidden="true">
+    <div class="panel-close" id="panel-close"></div>
+    <div id="panel-meta"></div>
+    <div class="panel-title" id="panel-title"></div>
+    <div class="panel-section">
+      <div class="panel-label" data-lens-copy="panelLabelContext">Context</div>
+      <div class="panel-content" id="panel-context"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label" data-lens-copy="panelLabelThreat">Risk</div>
+      <div class="panel-content" id="panel-threat"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label" data-lens-copy="panelLabelAction">Control</div>
+      <div class="panel-content" id="panel-action"></div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-label" data-lens-copy="panelLabelTradeoff">Tradeoff</div>
+      <div class="panel-content" id="panel-tradeoff"></div>
+    </div>
+  </aside>
+
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

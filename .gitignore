@@ -1,0 +1,14 @@
+node_modules
+dist
+.DS_Store
+*.log
+.vscode
+.idea
+.claude
+HANDOFF.md
+cr1.jpg
+labshot.mjs
+vowshot.mjs
+vowshome-shot.mjs
+resonanceshot.mjs
+_capDisp.mjs

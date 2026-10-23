@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lens-tpl="Writeups · {title}">Writeups · Security as Code</title>
+  <meta name="description" content="Machine writeups: HackTheBox and CTF. Recon, foothold, privilege escalation, root.">
+  <style>
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16vh var(--margin) 12vh;
+    }
+
+    /* ---------- List view ---------- */
+
+    .wu-head h1 {
+      font-size: clamp(40px, 8vw, 104px);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+    }
+
+    .wu-head .lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(15px, 1.5vw, 20px);
+      color: var(--fg-dim);
+      max-width: 560px;
+      line-height: 1.55;
+      margin-bottom: 40px;
+    }
+
+    .wu-filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .wu-filters button {
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--fg-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .wu-filters button:hover { color: var(--fg); }
+    .wu-filters button.active { color: var(--accent); border-color: var(--accent); }
+
+    #wu-list { border-bottom: 1px solid var(--line); }
+
+    .wu-row {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) 90px 110px 96px 40px;
+      align-items: baseline;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--line);
+      padding: 24px 0;
+      cursor: pointer;
+      color: var(--fg);
+      font-family: var(--mono);
+      transition: padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .wu-row:is(:hover, :focus-visible) { padding-left: 16px; }
+    .wu-row:is(:hover, :focus-visible) .wu-name { color: var(--accent); }
+
+    .wu-idx { font-size: 11px; letter-spacing: 2px; color: var(--fg-faint); }
+
+    .wu-name {
+      font-family: var(--display);
+      font-size: clamp(19px, 2.4vw, 32px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      transition: color 0.3s ease;
+      padding-right: 16px;
+    }
+
+    .wu-meta-cell {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    .wu-diff {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .wu-diff[data-d="easy"] { color: #7da87d; }
+    .wu-diff[data-d="medium"] { color: #c9a227; }
+    .wu-diff[data-d="hard"] { color: var(--accent); }
+    .wu-diff[data-d="insane"] { color: #b15fc4; }
+
+    .wu-arrow {
+      font-family: var(--display);
+      font-size: 18px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-align: right;
+    }
+
+    .wu-row:is(:hover, :focus-visible) .wu-arrow { opacity: 1; transform: translateX(0); }
+
+    .wu-empty {
+      padding: 48px 0;
+      color: var(--fg-faint);
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* ---------- Sealed locker (empty state) ---------- */
+    .wu-locker {
+      margin-top: 12px;
+      padding: 56px 40px;
+      border: 1px solid var(--line);
+      background:
+        repeating-linear-gradient(45deg, rgba(var(--accent-rgb), 0.04) 0 10px, transparent 10px 20px);
+      max-width: 560px;
+    }
+    .wu-locker .wl-bars { display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; }
+    .wu-locker .wl-bars span {
+      height: 11px;
+      background: var(--line);
+      display: block;
+    }
+    .wu-locker .wl-bars span:nth-child(1) { width: 62%; background: rgba(var(--accent-rgb), 0.32); }
+    .wu-locker .wl-bars span:nth-child(2) { width: 88%; }
+    .wu-locker .wl-bars span:nth-child(3) { width: 44%; }
+    .wu-locker .wl-bars span:nth-child(4) { width: 71%; }
+    .wu-locker .wl-line {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .wu-locker .wl-note {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--fg-dim);
+      max-width: 40em;
+      margin-bottom: 24px;
+    }
+    .wu-locker .wl-reopen {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--fg-dim);
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .wu-locker .wl-reopen:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ---------- "Records purged" modal ---------- */
+    #purge-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(5, 5, 6, 0.72);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+    #purge-scrim.open { opacity: 1; visibility: visible; }
+
+    #purge-modal {
+      position: relative;
+      width: min(540px, 100%);
+      background: rgba(12, 12, 13, 0.98);
+      border: 1px solid var(--line);
+      border-top: 1px solid var(--accent);
+      padding: 40px 40px 34px;
+      overflow: hidden;
+      transform: translateY(16px);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #purge-scrim.open #purge-modal { transform: translateY(0); }
+
+    #purge-modal .pm-stamp {
+      position: absolute;
+      top: 40px;
+      right: -14px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 44px;
+      letter-spacing: 2px;
+      color: rgba(var(--accent-rgb), 0.13);
+      transform: rotate(-9deg);
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+    #purge-modal .pm-tag {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    #purge-modal .pm-tag span:first-child { color: var(--accent); }
+    #purge-modal .pm-tag .pm-code { color: var(--fg-faint); }
+    #purge-modal .pm-title {
+      font-family: var(--display);
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      text-transform: none;
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+    #purge-modal .pm-body p {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.66;
+      color: var(--fg-dim);
+      margin-bottom: 13px;
+    }
+    #purge-modal .pm-body code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.08);
+      padding: 1px 5px;
+    }
+    #purge-modal .pm-sign {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin: 18px 0 26px;
+    }
+    #purge-modal .pm-actions {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+    #purge-modal .pm-cta {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      padding: 12px 18px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    #purge-modal .pm-cta:hover { background: var(--accent); color: var(--bg); }
+    #purge-modal .pm-dismiss {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    #purge-modal .pm-dismiss:hover { color: var(--fg); }
+
+    @media (prefers-reduced-motion: reduce) {
+      #purge-scrim, #purge-modal { transition: none; }
+    }
+
+    /* ---------- Article view ---------- */
+
+    #wu-article { display: none; }
+    body.article-mode #wu-list-view { display: none; }
+    body.article-mode #wu-article { display: block; }
+
+    .wu-back {
+      background: none;
+      border: none;
+      color: var(--fg-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-bottom: 40px;
+      transition: color 0.3s ease;
+    }
+
+    .wu-back:hover { color: var(--accent); }
+
+    .art-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 28px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      padding-bottom: 22px;
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .art-meta b { color: var(--fg-dim); font-weight: 400; }
+    .art-meta .pill-platform { color: var(--accent); }
+
+    .wu-body { font-family: var(--display); font-weight: 300; }
+
+    .wu-body h1 {
+      font-size: clamp(34px, 6vw, 68px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      margin: 0 0 32px;
+    }
+
+    .wu-body h2 {
+      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin: 56px 0 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--fg);
+    }
+
+    .wu-body h3 {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 32px 0 12px;
+    }
+
+    .wu-body p,
+    .wu-body li {
+      font-size: clamp(15px, 1.3vw, 18px);
+      line-height: 1.7;
+      color: var(--fg-dim);
+    }
+
+    .wu-body p { margin: 0 0 18px; }
+    .wu-body ul, .wu-body ol { margin: 0 0 18px 24px; }
+    .wu-body li { margin-bottom: 8px; }
+
+    .wu-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--line); }
+    .wu-body a:hover { border-color: var(--accent); }
+
+    .wu-body strong { color: var(--fg); font-weight: 500; }
+
+    .wu-body blockquote {
+      border-left: 2px solid var(--accent);
+      padding-left: 20px;
+      margin: 0 0 22px;
+      color: var(--fg);
+    }
+
+    .wu-body hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+
+    /* Inline + block code: terminal look */
+    .wu-body :not(pre) > code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: rgba(232, 230, 225, 0.07);
+      border: 1px solid var(--line);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--fg);
+    }
+
+    .wu-body pre {
+      position: relative;
+      background: #0d0f12;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      margin: 0 0 24px;
+      overflow: hidden;
+    }
+
+    .wu-body pre::before {
+      content: '> SHELL';
+      display: block;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--fg-ghost);
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(232, 230, 225, 0.03);
+    }
+
+    .wu-body pre code {
+      display: block;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cdd6cf;
+      padding: 16px 18px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .code-copy {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--fg-faint);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .code-copy:hover { color: var(--accent); border-color: var(--accent); }
+
+    .wu-body figure { margin: 0 0 28px; }
+
+    .wu-body img {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--line);
+      cursor: zoom-in;
+    }
+
+    .wu-body figcaption {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-top: 8px;
+      padding-left: 12px;
+      border-left: 1px solid var(--accent);
+    }
+
+    /* Image lightbox */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(5, 5, 6, 0.94);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      cursor: zoom-out;
+    }
+
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 100%; max-height: 100%; border: 1px solid var(--line); }
+
+    @media (max-width: 760px) {
+      .wu-row { grid-template-columns: 44px minmax(0, 1fr) 70px 40px; }
+      .wu-row .wu-meta-cell.os, .wu-row .wu-meta-cell.date { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="boot">
+      <div class="boot-header">Evidence Index v3.0.0</div>
+      <div id="boot-log"></div>
+      <div class="boot-progress"><div id="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="frame-top">
+    <div class="frame-id">
+      <div class="case-id" data-lens-tpl="{file} · Field Notes">System 0001 · Field Notes</div>
+      <div class="examiner">Machine Writeups</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="../" data-lens-tpl="{home}">Home</a>
+      <a href="../projects/">Projects</a>
+      <a href="../cv/">Dossier</a>
+      <a href="./" class="active">Writeups</a>
+    </nav>
+  </div>
+
+  <main>
+    <div id="wu-list-view">
+      <div class="wu-head">
+        <div class="sec-label">Field Notes · Offensive Security</div>
+        <h1>Machine<br>Writeups</h1>
+        <p class="lede">
+          Recorded intrusions against deliberately vulnerable targets: HackTheBox
+          boxes and CTF challenges. Each report walks the kill chain: recon,
+          foothold, privilege escalation, root.
+        </p>
+      </div>
+      <div class="wu-filters" id="wu-filters"></div>
+      <div id="wu-list"></div>
+    </div>
+
+    <article id="wu-article">
+      <button class="wu-back" id="wu-back">← Back to index</button>
+      <div class="art-meta" id="art-meta"></div>
+      <div class="wu-body" id="art-body"></div>
+    </article>
+  </main>
+
+  <div id="lightbox"><img alt="" /></div>
+
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+  <script type="module" src="/src/writeups.js"></script>
+</body>
+</html>

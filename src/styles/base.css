@@ -1,0 +1,334 @@
+/* Shared design system: palette, type, frame, cursor, loader */
+
+/* Layered so every page's unlayered inline <style> wins ties, even though the
+   build emits that <style> before this sheet's <link>. */
+@layer base {
+  :root {
+    --bg: #0a0a0b;
+    --fg: #e8e6e1;
+    --fg-dim: rgba(232, 230, 225, 0.55);
+    /* 0.51 is the floor for 4.5:1 on --bg; use --fg-ghost for decoration only */
+    --fg-faint: rgba(232, 230, 225, 0.51);
+    --fg-ghost: rgba(232, 230, 225, 0.28);
+    /* Accent tokens are owned by the active lens (src/theme). These are only
+       the no-JS fallback; with JS they are set before first paint. */
+    --accent: #2fb6c4;
+    --accent-rgb: 47, 182, 196;
+    --accent-ink: #16757f;
+    --line: rgba(232, 230, 225, 0.12);
+    --display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+    --margin: clamp(20px, 4vw, 56px);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 230, 225, 0.18) transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    font-family: var(--mono);
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    overscroll-behavior: none;
+  }
+
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  body.has-custom-cursor :is(textarea, input:not([type=range], [type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=color], [type=file])) {
+    cursor: text !important;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  /* ---------- Custom cursor ---------- */
+
+  #cursor-dot,
+  #cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 2000;
+    display: none;
+    transition: opacity 0.2s ease;
+  }
+
+  body.has-custom-cursor #cursor-dot,
+  body.has-custom-cursor #cursor-ring {
+    display: block;
+  }
+
+  body.cursor-away #cursor-dot,
+  body.cursor-away #cursor-ring,
+  body.cursor-text #cursor-dot,
+  body.cursor-text #cursor-ring {
+    opacity: 0;
+  }
+
+  #cursor-dot::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: 4px;
+    height: 4px;
+    background: var(--fg);
+  }
+
+  #cursor-ring::after {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--fg-dim);
+    border-radius: 50%;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  body.is-hover #cursor-ring::after {
+    transform: scale(1.6);
+    border-color: var(--accent);
+  }
+
+  /* ---------- Fixed top frame + nav ---------- */
+
+  .frame-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px var(--margin);
+    pointer-events: none;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .frame-top > * { pointer-events: auto; }
+
+  .frame-id .case-id { color: var(--fg-dim); }
+  .frame-id .examiner { color: var(--fg); margin-top: 4px; }
+
+  .frame-nav {
+    display: flex;
+    gap: 22px;
+  }
+
+  .frame-nav a {
+    color: var(--fg-faint);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    padding-bottom: 4px;
+    border-bottom: 1px solid transparent;
+  }
+
+  .frame-nav a:hover { color: var(--fg); }
+
+  .frame-nav a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .frame-top {
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+
+    .frame-id {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    .frame-id .case-id {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .frame-id .examiner { display: none; }
+
+    .frame-nav {
+      flex: 1 1 100%;
+      justify-content: space-between;
+      gap: 12px;
+      letter-spacing: 1.5px;
+    }
+  }
+
+  /* ---------- Section label ---------- */
+
+  .sec-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .sec-label::after {
+    content: '';
+    width: 48px;
+    height: 1px;
+    background: var(--line);
+  }
+
+  h1, h2 {
+    font-family: var(--display);
+    text-transform: uppercase;
+    font-kerning: normal;
+  }
+
+  /* ---------- Loading screen ---------- */
+
+  #loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease;
+  }
+
+  #loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .boot { width: min(440px, 86vw); }
+
+  .boot-header {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #boot-log {
+    font-size: 11px;
+    line-height: 2;
+    color: var(--fg-dim);
+    min-height: 154px;
+  }
+
+  #boot-log .ok { color: var(--accent); }
+
+  #boot-log div { animation: boot-line 0.25s ease both; }
+
+  @keyframes boot-line {
+    from { opacity: 0; transform: translateX(-4px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .boot-progress {
+    margin-top: 16px;
+    height: 1px;
+    background: var(--line);
+    position: relative;
+  }
+
+  #boot-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  /* ---------- WebGL fallback ---------- */
+
+  #webgl-fallback {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--bg);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+
+  #webgl-fallback.visible { display: flex; }
+
+  #webgl-fallback .inner {
+    max-width: 480px;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--fg-dim);
+  }
+
+  #webgl-fallback h1 {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--fg);
+    margin-bottom: 16px;
+  }
+
+  #webgl-fallback a { color: var(--accent); }
+
+  /* ---------- Lens switch veil (codename typed on a live page) ---------- */
+
+  .lens-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--fg-dim);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .lens-veil.on { opacity: 1; }
+}

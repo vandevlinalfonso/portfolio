@@ -1,0 +1,14 @@
+[
+  {
+    "id": "phil-001",
+    "text": "Security that ships late is security that gets skipped. Move it left, make it automatic."
+  },
+  {
+    "id": "phil-002",
+    "text": "The goal isn't a gate that says no. It's a pipeline that quietly catches the problem before anyone has to."
+  },
+  {
+    "id": "phil-003",
+    "text": "Every check should earn its place. Noise trains people to ignore the alarm that finally matters."
+  }
+]

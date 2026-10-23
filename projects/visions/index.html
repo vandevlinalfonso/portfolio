@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lens-tpl="Visions · {title}">Visions · Security as Code</title>
+  <meta name="description" content="Photomanipulation artworks rebuilt as live WebGL scenes. Scroll to travel through each picture.">
+  <style>
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    main { position: relative; z-index: 2; }
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18vh var(--margin);
+      max-width: 1560px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .v-intro h1 {
+      font-size: clamp(56px, 11vw, 152px);
+      font-weight: 700;
+      line-height: 0.94;
+      letter-spacing: -0.025em;
+      margin-bottom: 36px;
+    }
+
+    .v-intro h1 .accent { color: var(--accent); }
+
+    .v-lede {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: clamp(16px, 1.6vw, 21px);
+      line-height: 1.55;
+      color: var(--fg-dim);
+      max-width: 520px;
+    }
+
+    .v-intro { position: relative; }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 40px;
+      left: var(--margin);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      animation: cue-pulse 2.6s ease-in-out infinite;
+    }
+
+    @keyframes cue-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.85; }
+    }
+
+    /* Exhibit scroll runways — empty, they only provide travel distance */
+    .v-exhibit { min-height: 340vh; pointer-events: none; }
+
+    .v-outro { text-align: left; }
+
+    .v-outro h2 {
+      font-size: clamp(34px, 5.6vw, 80px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.02;
+      margin-bottom: 32px;
+    }
+
+    .v-outro a {
+      font-family: var(--display);
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 500;
+      text-transform: uppercase;
+      color: var(--fg);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .v-outro a:hover { color: var(--accent); }
+
+    /* ---------- Museum plaques ---------- */
+
+    .plaque {
+      position: fixed;
+      left: var(--margin);
+      bottom: 72px;
+      z-index: 40;
+      width: min(360px, 78vw);
+      padding: 16px 24px 16px 18px;
+      border-left: 1px solid var(--accent);
+      background: radial-gradient(ellipse at 20% 60%, rgba(5, 5, 8, 0.78), rgba(5, 5, 8, 0) 75%);
+      text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+      pointer-events: none;
+    }
+
+    .plaque.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .plaque .p-no {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .plaque .p-title {
+      font-family: var(--display);
+      font-size: clamp(28px, 3.4vw, 44px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .plaque .p-desc {
+      font-family: var(--display);
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--fg-dim);
+      margin-bottom: 16px;
+      max-width: 320px;
+    }
+
+    .plaque .p-meta {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    /* Exhibit progress, right edge */
+    #v-progress {
+      position: fixed;
+      right: var(--margin);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-end;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--fg-faint);
+    }
+
+    #v-progress .vp {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+      transition: color 0.4s ease;
+    }
+
+    #v-progress .vp .bar {
+      width: 36px;
+      height: 1px;
+      background: var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #v-progress .vp .bar i {
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    #v-progress .vp.active { color: var(--accent); }
+
+    /* Warp flash between exhibits */
+    #warp {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: #e8e6e1;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      #v-progress { display: none; }
+      .plaque { bottom: 32px; }
+      .frame-nav a { letter-spacing: 1px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <div class="boot">
+      <div class="boot-header">Gallery Runtime v3.0.0</div>
+      <div id="boot-log"></div>
+      <div class="boot-progress"><div id="boot-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="webgl-fallback">
+    <div class="inner">
+      <h1>Gallery Unavailable</h1>
+      <p>This gallery requires WebGL, which your browser does not support or has disabled.</p>
+      <p><a href="../../">Return to the case file</a></p>
+    </div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <div class="frame-top">
+    <div class="frame-id">
+      <div class="case-id" data-lens-tpl="{file} · Annex">System 0001 · Annex</div>
+      <div class="examiner">Visions · Photomanipulation</div>
+    </div>
+    <nav class="frame-nav" aria-label="Pages">
+      <a href="../../" data-lens-tpl="{home}">Home</a>
+      <a href="../" class="active">Projects</a>
+      <a href="../../cv/">Dossier</a>
+      <a href="../../writeups/">Writeups</a>
+    </nav>
+  </div>
+
+  <div id="v-progress"></div>
+  <div id="warp"></div>
+
+  <main>
+    <section class="v-intro">
+      <div class="sec-label">Annex · Visual Work</div>
+      <h1>Visions<br><span class="accent">in three plates.</span></h1>
+      <p class="v-lede">
+        Photomanipulation from another life. Each plate hangs in the dark
+        and gains depth: scroll, and the camera drifts through the surface
+        and into the image before the next one rises out of the black.
+      </p>
+      <div class="scroll-cue">Enter the gallery ↓</div>
+    </section>
+
+    <section class="v-exhibit" data-exhibit="0"></section>
+    <section class="v-exhibit" data-exhibit="1"></section>
+    <section class="v-exhibit" data-exhibit="2"></section>
+
+    <section class="v-outro">
+      <div class="sec-label">End of Annex</div>
+      <h2>The examination<br>continues.</h2>
+      <p style="display:flex; gap:32px; flex-wrap:wrap;">
+        <a href="../">← All Projects</a>
+        <a href="../../writeups/">Machine Writeups →</a>
+      </p>
+    </section>
+  </main>
+
+  <div id="plaques"></div>
+
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+  <script type="module" src="/src/visions.js"></script>
+</body>
+</html>

@@ -157,8 +157,9 @@ DevTools → Application → Local Storage → delete `aob-state-v1`.
 
 ## Deploy
 
-Push to `main` with GitHub Pages set to **GitHub Actions** in repo settings.
-The workflow in `.github/workflows/deploy.yml` does the rest.
+Run `npm run deploy` — it builds `dist/` and pushes it to the `gh-pages`
+branch (GitHub Pages source: **Deploy from a branch → `gh-pages` / root**).
+Commit and push your source to `main` separately.
 
 ## If something looks wrong
 

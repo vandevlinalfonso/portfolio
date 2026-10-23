@@ -362,11 +362,11 @@ lens, not just Home, and so do open tabs.
 
 ## Deployment — GitHub Pages
 
-`.github/workflows/deploy.yml` builds and deploys on every push to `main`:
+`npm run deploy` builds `dist/` and pushes it to the `gh-pages` branch:
 
 1. Push the repo to GitHub
-2. **Settings → Pages → Source: GitHub Actions**
-3. Push to `main` → live at `https://<user>.github.io/<repo>/`
+2. **Settings → Pages → Source: Deploy from a branch → `gh-pages` / root**
+3. `npm run deploy` → live at `https://<user>.github.io/<repo>/`
 
 `base: './'` in `vite.config.js` plus `import.meta.env.BASE_URL` data fetches
 mean it works from any subpath unchanged.
